@@ -47,10 +47,10 @@ body {
 .btn-outline:hover { border-color: #ff6b35; color: #ff6b35; }
 .back-link { display: inline-block; color: #555; text-decoration: none; margin-top: 1rem; font-size: 0.9rem; opacity: 0.8; transition: opacity 0.3s; }
 .back-link:hover { opacity: 1; }
-.registration-container { max-width: 600px; width: 100%; }
+.registration-container { max-width: 520px; width: 100%; margin: 0 auto; }
 .form-container {
     background: linear-gradient(135deg, #ff6b35 0%, #f73378 100%);
-    padding: 2.5rem;
+    padding: 2rem;
     border-radius: 1rem;
     box-shadow: 0 20px 60px rgba(0,0,0,0.15);
     color: white;
