@@ -360,11 +360,6 @@ function initSignupModal() {
             <div class="login-dialog" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
                 <button class="login-close" type="button" data-signup-close aria-label="Uždaryti">×</button>
                 <div class="registration-container">
-                    <div class="logo-header">
-                        <a href="index.html" class="logo">CityEvents</a>
-                        <br>
-                        <a href="index.html" class="back-link">← Grįžti į pagrindinį</a>
-                    </div>
                     <div id="signupSuccess" class="success-message">Paskyra sukurta! Galite prisijungti ir registruoti renginius.</div>
                     <div id="signupError" class="error-message">Nepavyko sukurti paskyros.</div>
                     <div class="form-container">
