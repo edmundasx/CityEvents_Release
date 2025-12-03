@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Events – Atrask renginius, kurie tau patinka</title>
+    <meta name="description" content="Rask ir dalyvauk renginiuose, naršyk organizatorius arba sukurk savo renginį. Atrask muzikos, meno, verslo, maisto ir kitų sričių renginius.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+z0ympK0tZbFdK4JeayQMZTcWd3vgXn8fLJXYM/to=" crossorigin="">
+</head>
+<body data-page="home">
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">CityEvents</a>
+            <nav class="nav">
+                <a href="#events">Browse Events</a>
+                <a href="#mapCard">Map</a>
+                <a href="organizer-events.html">For Organizers</a>
+                <a href="admin.html" data-nav-admin style="display: none;">Admin</a>
+            </nav>
+            <div class="header-actions" id="authActions"></div>
+        </div>
+    </header>
+
+<section class="hero">
+    <div class="hero-map">
+        <iframe title="CityEvents žemėlapis" loading="lazy" allowfullscreen
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d11726.80211415098!2d25.270995520660346!3d54.68715549788121!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46dd93f23f41b1af%3A0x400d18c7e101770!2sVilnius!5e0!3m2!1slt!2slt!4v1700000000000"></iframe>
+    </div>
+    <div class="hero-content">
+        <h1>Atrask renginius viskam, ką mėgsti</h1>
+        <p>Rask ir dalyvauk renginiuose, bendrauk su organizatoriais arba sukurk savo renginį</p>
+
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="Ieškoti renginių" id="searchInput">
+            <input type="text" class="search-input" placeholder="Vieta" id="locationInput">
+            <button class="btn btn-primary" id="searchButton">Ieškoti</button>
+        </div>
+    </div>
+</section>
+
+<section class="categories">
+    <div class="categories-content">
+        <div class="category" data-category="music">
+            <span class="category-icon">🎵</span>
+            <span class="category-label">Muzika</span>
+        </div>
+        <div class="category" data-category="arts">
+            <span class="category-icon">🎨</span>
+            <span class="category-label">Menas</span>
+        </div>
+        <div class="category" data-category="charity">
+            <span class="category-icon">❤️</span>
+            <span class="category-label">Labdara</span>
+        </div>
+        <div class="category" data-category="business">
+            <span class="category-icon">💼</span>
+            <span class="category-label">Verslas</span>
+        </div>
+        <div class="category" data-category="education">
+            <span class="category-icon">📚</span>
+            <span class="category-label">Švietimas</span>
+        </div>
+        <div class="category" data-category="food">
+            <span class="category-icon">🍽️</span>
+            <span class="category-label">Maistas ir gėrimai</span>
+        </div>
+    </div>
+</section>
+
+<section class="events-section" id="events">
+    <div class="section-header">
+        <div>
+            <h2>Renginiai tavo mieste</h2>
+            <p>Atrask įdomiausius įvykius šalia tavęs</p>
+        </div>
+        <button class="btn btn-outline" id="resetFilters">Peržiūrėti visus</button>
+    </div>
+
+    <div class="events-grid" id="eventsGrid">
+        <div class="loading">Įkeliami renginiai...</div>
+    </div>
+</section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-column footer-brand">
+                <a href="index.html" class="logo">CityEvents</a>
+                <p>Miesto renginių platforma, padedanti greitai rasti, kur verta sudalyvauti.</p>
+            </div>
+
+            <div class="footer-column">
+                <h4>Navigacija</h4>
+                <a href="#events">Renginiai</a>
+                <a href="#mapCard">Žemėlapis</a>
+                <a href="organizer-events.html">Organizatoriams</a>
+            </div>
+
+            <div class="footer-column">
+                <h4>Naudinga</h4>
+                <a href="#">DUK</a>
+                <a href="signup.html">Registracija</a>
+            </div>
+
+            <div class="footer-column footer-newsletter">
+                <h4>Naujienlaiškis</h4>
+                <p>Gauk populiariausius renginius tiesiai į el. paštą.</p>
+                <form class="footer-form" onsubmit="event.preventDefault()">
+                    <input type="email" placeholder="El. pašto adresas">
+                    <button type="submit" class="btn btn-primary">Prenumeruoti</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2025 CityEvents. Visos teisės saugomos.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j7kP5qL1aQW2Niqn1ytY1/6ae2q3X1gjp3pqt8M=" crossorigin=""></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
