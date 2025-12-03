@@ -258,6 +258,7 @@ function sanitizePayload(payload = {}) {
 }
 
 let toggleLoginModal = () => {};
+let toggleSignupModal = () => {};
 
 function initLoginModal() {
     if (document.getElementById('loginModal')) return;
@@ -349,11 +350,107 @@ function initLoginModal() {
     });
 }
 
+function initSignupModal() {
+    if (document.getElementById('signupModal')) return;
+
+    const modalWrapper = document.createElement('div');
+    modalWrapper.innerHTML = `
+        <div class="login-modal signup-modal" id="signupModal" aria-hidden="true">
+            <div class="login-backdrop" data-signup-close></div>
+            <div class="login-dialog" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
+                <button class="login-close" type="button" data-signup-close aria-label="Uždaryti">×</button>
+                <div class="registration-container">
+                    <div class="logo-header">
+                        <a href="index.html" class="logo">CityEvents</a>
+                        <br>
+                        <a href="index.html" class="back-link">← Grįžti į pagrindinį</a>
+                    </div>
+                    <div id="signupSuccess" class="success-message">Paskyra sukurta! Galite prisijungti ir registruoti renginius.</div>
+                    <div id="signupError" class="error-message">Nepavyko sukurti paskyros.</div>
+                    <div class="form-container">
+                        <div class="form-header">
+                            <h2 id="signupTitle">Sukurti paskyrą</h2>
+                            <p>Pasirinkite ar esate dalyvis ar organizatorius</p>
+                        </div>
+
+                        <form id="signupForm">
+                            <div class="form-group">
+                                <label class="form-label" for="name">Vardas ir pavardė</label>
+                                <input class="form-input" type="text" id="name" name="name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="email">El. paštas</label>
+                                <input class="form-input" type="email" id="email" name="email" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="password">Slaptažodis</label>
+                                <input class="form-input" type="password" id="password" name="password" minlength="6" required>
+                            </div>
+
+                            <div class="form-group">
+                                <span class="form-label">Pasirinkite paskyros tipą</span>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="role" value="user" checked>
+                                        <span class="radio-label">Dalyvis</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="role" value="organizer">
+                                        <span class="radio-label">Organizatorius</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button class="submit-btn" type="submit">Registruotis</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `.trim();
+
+    const modal = modalWrapper.firstElementChild;
+    document.body.appendChild(modal);
+
+    const form = modal.querySelector('#signupForm');
+    const success = modal.querySelector('#signupSuccess');
+    const error = modal.querySelector('#signupError');
+
+    function toggleSignup(open) {
+        modal.classList.toggle('open', open);
+        modal.setAttribute('aria-hidden', open ? 'false' : 'true');
+        if (open) {
+            success.style.display = 'none';
+            error.style.display = 'none';
+            modal.querySelector('#name')?.focus();
+        }
+    }
+
+    toggleSignupModal = toggleSignup;
+
+    modal.querySelectorAll('[data-signup-close]').forEach(btn => {
+        btn.addEventListener('click', () => toggleSignup(false));
+    });
+
+    handleSignup();
+}
+
 function bindLoginTriggers() {
     document.querySelectorAll('.js-login-trigger').forEach(trigger => {
         trigger.addEventListener('click', (e) => {
             e.preventDefault();
             toggleLoginModal(true);
+        });
+    });
+}
+
+function bindSignupTriggers() {
+    document.querySelectorAll('.js-signup-trigger').forEach(trigger => {
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleSignupModal(true);
         });
     });
 }
@@ -368,9 +465,10 @@ function renderAuthActions() {
     if (!user) {
         container.innerHTML = `
             <a class="btn btn-outline js-login-trigger" href="#login">Prisijungti</a>
-            <a class="btn btn-primary" href="signup.html">Registruotis</a>
+            <a class="btn btn-primary js-signup-trigger" href="#signup">Registruotis</a>
         `;
         bindLoginTriggers();
+        bindSignupTriggers();
         return;
     }
 
@@ -847,6 +945,11 @@ async function handleSignup() {
             success.style.display = 'block';
             success.textContent = 'Paskyra sukurta! Jūsų ID: ' + data.user.id;
             form.reset();
+            renderAuthActions();
+            const modal = form.closest('.login-modal');
+            if (modal) {
+                setTimeout(() => toggleSignupModal(false), 800);
+            }
         } catch (err) {
             error.style.display = 'block';
             error.textContent = err.message || 'Nepavyko užsiregistruoti.';
@@ -1567,7 +1670,9 @@ function init() {
         ensureAuthContainer();
 
         initLoginModal();
+        initSignupModal();
         bindLoginTriggers();
+        bindSignupTriggers();
         renderAuthActions();
     }
     switch (page) {
