@@ -178,12 +178,16 @@ body {
     font-size: 3rem;
     margin-bottom: 1rem;
     font-weight: 700;
+    -webkit-text-stroke: 1px #000;
+    text-stroke: 1px #000;
 }
 
 .hero p {
     font-size: 1.25rem;
     margin-bottom: 2rem;
     opacity: 0.95;
+    -webkit-text-stroke: 1px #000;
+    text-stroke: 1px #000;
 }
 
 /* Search */
