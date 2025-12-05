@@ -199,6 +199,16 @@ const adminCalendarState = {
     likedEventDates: new Set(),
 };
 
+function formatDateKey(date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return null;
+
+    return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0'),
+    ].join('-');
+}
+
 function getStoredUser() {
     const user = parseStoredJSON(USER_STORAGE_KEY);
     if (!user || typeof user !== 'object') return null;
@@ -1428,8 +1438,10 @@ async function loadUserDashboard() {
         header.textContent = `${user.name}, jūsų renginiai ir mėgstamiausi`;
     }
 
+    let favorites = [];
     try {
-        const { favorites } = await fetchJSON(`${API_BASE}?resource=favorites&user_id=${user.id}`);
+        const response = await fetchJSON(`${API_BASE}?resource=favorites&user_id=${user.id}`);
+        favorites = response.favorites || [];
         renderEvents(favorites, { containerId: 'likedEvents', showStatus: false, showNotificationButton: true });
     } catch (error) {
         console.error("Failed to load liked events:", error);
@@ -1442,7 +1454,9 @@ async function loadUserDashboard() {
     loadRecommendations();
     await ensureNotificationsLoaded();
     renderNotifications('userNotifications', 'user');
-    renderAdminCalendarGrid(state.events);
+    updateLikedCalendarState(favorites);
+    renderUpcomingLikedEvents(favorites);
+    renderAdminCalendarGrid(favorites);
 }
 
 function hydrateOrganizerEditForm() {
@@ -1596,10 +1610,12 @@ function renderAdminCalendarGrid(events = []) {
 
         const hasEvent = dayEvents.length > 0;
         const isToday = new Date().getFullYear() === year && new Date().getMonth() === month && new Date().getDate() === day;
-        
+        const dayKey = formatDateKey(new Date(year, month, day));
+        const hasLikedEvent = dayKey ? adminCalendarState.likedEventDates.has(dayKey) : false;
+
         let dayClass = 'calendar-day';
         if (isToday) dayClass += ' today';
-        if (hasEvent) dayClass += ' has-event';
+        if (hasEvent || hasLikedEvent) dayClass += ' has-event';
 
         cells.push(`<div class="${dayClass}">${day}</div>`);
     }
@@ -1617,6 +1633,49 @@ function changeMonth(delta = 0) {
 }
 
 window.changeMonth = changeMonth;
+window.prevMonth = () => changeMonth(-1);
+window.nextMonth = () => changeMonth(1);
+
+function updateLikedCalendarState(events = []) {
+    adminCalendarState.likedEventDates = new Set();
+
+    events.forEach((event) => {
+        const date = new Date(event.event_date);
+        const key = formatDateKey(date);
+        if (key) {
+            adminCalendarState.likedEventDates.add(key);
+        }
+    });
+}
+
+function renderUpcomingLikedEvents(events = []) {
+    const list = document.getElementById('upcomingEventsList');
+    if (!list) return;
+
+    const now = new Date();
+    const upcoming = events
+        .map(event => ({ ...event, parsedDate: new Date(event.event_date) }))
+        .filter(event => !Number.isNaN(event.parsedDate.getTime()) && event.parsedDate >= now)
+        .sort((a, b) => a.parsedDate - b.parsedDate)
+        .slice(0, 5);
+
+    if (!upcoming.length) {
+        list.innerHTML = '<div class="loading">Nėra artimiausių pamėgtų renginių.</div>';
+        return;
+    }
+
+    list.innerHTML = upcoming.map(event => `
+        <div class="list-item">
+            <div>
+                <strong>${event.title}</strong>
+                <div style="font-size: 0.8rem; color: var(--muted-foreground);">
+                    ${event.parsedDate.toLocaleString('lt-LT')} • ${event.location}
+                </div>
+            </div>
+            <span class="status-badge status-${event.status || 'approved'}">${formatStatus(event.status || 'approved')}</span>
+        </div>
+    `).join('');
+}
 
 function updateAdminStatCards(events = []) {
     const totalEventsEl = document.getElementById('totalEvents');
