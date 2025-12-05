@@ -7,9 +7,6 @@
     <meta name="description" content="CityEvents organizatoriams – valdykite renginius vienoje vietoje.">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/navbar.css">
-    
-    
-
     <link rel="stylesheet" href="assets/css/for-organizers.css">
 </head>
 <body data-page="for-organizers">
@@ -18,14 +15,32 @@
             <div class="header-left">
                 <a href="index.html" class="logo">CityEvents</a>
                 <nav class="nav">
-                    <a href="index.html#events" class="nav-link" title="Renginiai – pagrindinė renginių peržiūra">Renginiai</a>
-                    <a href="city-map.html" class="nav-link" title="Žemėlapis – vizualus renginių žemėlapis">Žemėlapis</a>
-                    <a href="for-organizers.html" class="nav-link" title="Organizatoriams – informacija renginių organizatoriams">Organizatoriams</a>
-                    <a href="help-center.html" class="nav-link" title="Pagalba – DUK ir pagalbos centras">Pagalba</a>
+                    <!-- Renginiai (Events): Core functionality – scrolls to events section on same page -->
+                    <a href="#events" class="nav-link" title="Renginiai – pagrindinė renginių peržiūra">
+                        Renginiai
+                    </a>
+
+                    <!-- Žemėlapis (Map): Visual exploration – opens city map page -->
+                    <a href="city-map.html" class="nav-link" title="Žemėlapis – vizualus renginių žemėlapis">
+                        Žemėlapis
+                    </a>
+
+                    <!-- Organizatoriams (For Organizers): Attract event hosts -->
+                    <a href="for-organizers.html" class="nav-link" title="Organizatoriams – informacija renginių organizatoriams">
+                        Organizatoriams
+                    </a>
+
+                    <!-- Pagalba (Help): FAQ access -->
+                    <a href="help-center.html" class="nav-link" title="Pagalba – DUK ir pagalbos centras">
+                        Pagalba
+                    </a>
                 </nav>
             </div>
             <div class="header-right">
-                <div class="header-actions" id="authActions"></div>
+                <div class="header-actions" id="authActions">
+                    <a class="btn btn-outline js-login-trigger" href="#login">Prisijungti</a>
+                    <a class="btn btn-primary js-signup-trigger" href="#signup">Registruotis</a>
+                </div>
             </div>
         </div>
     </header>
@@ -37,7 +52,7 @@
                 <p>Pasiekite tūkstančius miesto lankytojų, aiškiai pateikite informaciją ir patogiai valdykite bilietus bei dalyvius.</p>
                 <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
                     <a href="create-event.html" class="btn btn-primary">Sukurti renginį</a>
-                    <a href="organizer-dashboard.html" class="btn btn-outline">Mano renginiai</a>
+                    <a href="#" id="myEventsBtn" class="btn btn-outline">Mano renginiai</a>
                 </div>
             </div>
         </section>

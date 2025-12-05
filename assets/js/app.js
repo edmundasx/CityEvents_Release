@@ -176,27 +176,18 @@ function getStoredUser() {
 }
 
 function ensureAuthContainer() {
-    const headerContent = document.querySelector('.header .header-content');
-    if (!headerContent) return null;
-
-    // Cleanup legacy buttons if any
-    headerContent.querySelectorAll('button[onclick*="Login feature"], button[onclick*="Sign up feature"]').forEach(btn => {
-        const parent = btn.closest('div');
-        parent?.remove();
-    });
+    const headerRight = document.querySelector('.header .header-right');
+    if (!headerRight) {
+        console.error("Header right section not found. Cannot create auth actions container.");
+        return null;
+    }
 
     let container = document.getElementById('authActions');
     if (!container) {
         container = document.createElement('div');
         container.id = 'authActions';
         container.className = 'header-actions';
-        
-        const headerRight = headerContent.querySelector('.header-right');
-        if (headerRight) {
-            headerRight.appendChild(container);
-        } else {
-            headerContent.appendChild(container);
-        }
+        headerRight.appendChild(container);
     }
     return container;
 }
@@ -431,7 +422,11 @@ function bindSignupTriggers() {
 
 function renderAuthActions() {
     const container = ensureAuthContainer();
-    if (!container) return;
+    if (!container) {
+        // If the container doesn't exist, we can't render the buttons.
+        // The ensureAuthContainer function will have already logged an error.
+        return;
+    }
 
     const user = getStoredUser();
     syncNavRoleLinks(user);
@@ -1675,6 +1670,33 @@ function initHomePage() {
     loadOrganizerEvents();
 }
 
+function initForOrganizersPage() {
+    const myEventsBtn = document.getElementById('myEventsBtn');
+    if (!myEventsBtn) return;
+
+    myEventsBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const user = getStoredUser();
+
+        if (!user) {
+            promptLogin('Prisijunkite, kad matytumėte savo renginius.');
+            return;
+        }
+
+        switch (user.role) {
+            case 'organizer':
+                window.location.href = 'organizer-events.html';
+                break;
+            case 'admin':
+                window.location.href = 'admin-panel.html';
+                break;
+            default:
+                window.location.href = 'attender-panel.html';
+                break;
+        }
+    });
+}
+
 function init() {
     try {
         const page = document.body.dataset.page;
@@ -1714,6 +1736,9 @@ function init() {
             case 'organizer-events':
                 loadOrganizerEventsBoard();
                 initOrganizerEditForm();
+                break;
+            case 'for-organizers':
+                initForOrganizersPage();
                 break;
         }
     } catch (e) {

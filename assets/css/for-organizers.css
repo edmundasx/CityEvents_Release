@@ -12,9 +12,6 @@
 .hero h1 { font-size: 3rem; margin-bottom: 1.5rem; font-weight: 800; }
 .hero p { max-width: 700px; margin: 0 auto 2rem; font-size: 1.25rem; color: rgba(255,255,255,0.9); }
 
-.btn-outline { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.5); }
-.btn-outline:hover { border-color: white; background: rgba(255,255,255,0.1); }
-
 /* Grid Layouts */
 .events-section { max-width: 1100px; margin: 0 auto 5rem; padding: 0 1.5rem; }
 .section-header { text-align: center; margin-bottom: 3rem; }

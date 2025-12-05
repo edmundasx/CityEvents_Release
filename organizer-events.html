@@ -15,14 +15,32 @@
             <div class="header-left">
                 <a href="index.html" class="logo">CityEvents</a>
                 <nav class="nav">
-                    <a href="index.html" class="nav-link">Naršyti renginius</a>
-                    <a href="create-event.html" class="nav-link">Sukurti renginį</a>
-                    <a href="organizer-events.html" class="nav-link active">Mano renginiai</a>
-                    <a href="organizer-dashboard.html" class="nav-link">Skydelis</a>
+                    <!-- Renginiai (Events): Core functionality – scrolls to events section on same page -->
+                    <a href="#events" class="nav-link" title="Renginiai – pagrindinė renginių peržiūra">
+                        Renginiai
+                    </a>
+
+                    <!-- Žemėlapis (Map): Visual exploration – opens city map page -->
+                    <a href="city-map.html" class="nav-link" title="Žemėlapis – vizualus renginių žemėlapis">
+                        Žemėlapis
+                    </a>
+
+                    <!-- Organizatoriams (For Organizers): Attract event hosts -->
+                    <a href="for-organizers.html" class="nav-link" title="Organizatoriams – informacija renginių organizatoriams">
+                        Organizatoriams
+                    </a>
+
+                    <!-- Pagalba (Help): FAQ access -->
+                    <a href="help-center.html" class="nav-link" title="Pagalba – DUK ir pagalbos centras">
+                        Pagalba
+                    </a>
                 </nav>
             </div>
             <div class="header-right">
-                <div class="header-actions" id="authActions"></div>
+                <div class="header-actions" id="authActions">
+                    <a class="btn btn-outline js-login-trigger" href="#login">Prisijungti</a>
+                    <a class="btn btn-primary js-signup-trigger" href="#signup">Registruotis</a>
+                </div>
             </div>
         </div>
     </header>

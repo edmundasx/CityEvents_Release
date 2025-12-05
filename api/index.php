@@ -7,7 +7,8 @@ require_once __DIR__ . '/controllers/AdminController.php';
 require_once __DIR__ . '/controllers/FavoritesController.php';
 require_once __DIR__ . '/controllers/NotificationsController.php';
 
-$config = require __DIR__ . '/config.php';
+// Use require_once to prevent function redeclaration errors.
+$config = require_once __DIR__ . '/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
@@ -23,7 +24,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 try {
     switch ($resource) {
         case 'events':
-            handleEvents($method, $data, $input, $dataFile);
+            handleEvents($method, $input);
             return;
         case 'notifications':
             handleNotifications($data);
@@ -32,10 +33,10 @@ try {
             handleFavorites($method, $data, $input, $dataFile);
             return;
         case 'auth':
-            handleAuth($method, $data, $input);
+            handleAuth($method, $input);
             return;
         case 'users':
-            handleUsers($method, $data, $input, $dataFile);
+            handleUsers($method, $input, $dataFile);
             return;
         case 'admin':
             handleAdmin($method, $data, $input, $dataFile, $config);

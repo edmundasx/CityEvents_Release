@@ -81,3 +81,16 @@ function filter_events(array $events, array $params): array
 
     return $filtered;
 }
+
+/**
+ * Loads data from a JSON file. This is part of the old file-based data
+ * system and is still required by some parts of the application.
+ */
+function load_data(string $filePath, string $defaultKey = 'data'): array
+{
+    if (!file_exists($filePath)) {
+        return [$defaultKey => []];
+    }
+    $json = file_get_contents($filePath);
+    return json_decode($json, true) ?: [$defaultKey => []];
+}

@@ -223,12 +223,6 @@ body {
 .status-badge.status-pending { background: #fff7ed; color: #c2410c; }
 .status-badge.status-rejected { background: #fef2f2; color: #dc2626; }
 
-.btn { border: none; border-radius: 0.5rem; padding: 0.45rem 0.9rem; cursor: pointer; font-weight: 600; }
-.btn.approve { background: #22c55e; color: white; }
-.btn.reject { background: #ef4444; color: white; }
-.btn.block { background: #6b7280; color: white; }
-.btn:hover { opacity: 0.9; }
-
 .empty { text-align: center; color: #6b7280; padding: 2rem; }
 
 @media (max-width: 768px) {
