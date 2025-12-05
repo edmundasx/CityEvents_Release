@@ -251,10 +251,20 @@
             document.getElementById('profileAvatar').textContent = initials;
             document.getElementById('profileName').textContent = organizerData.name;
             document.getElementById('profileEmail').textContent = organizerData.email;
-            
+
             // Update header avatar
-            document.querySelector('.user-avatar').textContent = initials;
-            document.querySelector('.user-menu span').textContent = organizerData.name.split(' ')[0] + ' ' + organizerData.name.split(' ')[1]?.[0] + '.';
+            const headerAvatar = document.querySelector('.user-avatar');
+            const headerName = document.querySelector('.user-menu span');
+            const nameParts = organizerData.name.split(' ');
+            const headerDisplay = nameParts[0] + (nameParts[1] ? ` ${nameParts[1][0]}.` : '');
+
+            if (headerAvatar) {
+                headerAvatar.textContent = initials;
+            }
+
+            if (headerName) {
+                headerName.textContent = headerDisplay;
+            }
         }
 
         // Render stats
