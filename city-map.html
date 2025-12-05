@@ -233,6 +233,18 @@
     <script src="assets/js/app.js"></script>
     <script>
         let mapEvents = [];
+        let allEvents = [];
+
+        const filtersSidebar = document.getElementById('filtersSidebar');
+        const filterInputs = filtersSidebar.querySelectorAll('.filter-option input');
+        const activeFiltersEl = filtersSidebar.querySelector('.active-filters');
+
+        const neighborhoodKeywords = {
+            senamiestis: ['senamiestis', 'old town'],
+            snipiskes: ['šnipiškės', 'snipiskes'],
+            naujamiestis: ['naujamiestis'],
+            uzupis: ['užupis', 'uzupis'],
+        };
 
         function formatEventDate(eventDate) {
             const date = new Date(eventDate);
@@ -310,15 +322,184 @@
             document.getElementById('filtersSidebar').classList.toggle('active');
         }
 
-        function removeFilter(btn) {
-            btn.closest('.filter-tag').remove();
+        function getSelectedFilters() {
+            const selectedCategories = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(i => i.value);
+            const selectedNeighborhoods = Array.from(document.querySelectorAll('input[name="neighborhood"]:checked')).map(i => i.value);
+            const selectedPrices = Array.from(document.querySelectorAll('input[name="price"]:checked')).map(i => i.value);
+            const selectedDate = document.querySelector('input[name="date"]:checked');
+
+            return {
+                categories: selectedCategories,
+                neighborhoods: selectedNeighborhoods,
+                prices: selectedPrices,
+                date: selectedDate ? selectedDate.value : '',
+            };
+        }
+
+        function endOfDay(date) {
+            const end = new Date(date);
+            end.setHours(23, 59, 59, 999);
+            return end;
+        }
+
+        function getDateRange(dateFilter) {
+            if (!dateFilter) return null;
+
+            const now = new Date();
+            const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+            switch (dateFilter) {
+                case 'today':
+                    return { start, end: endOfDay(start) };
+                case 'tomorrow': {
+                    const tomorrow = new Date(start);
+                    tomorrow.setDate(start.getDate() + 1);
+                    return { start: tomorrow, end: endOfDay(tomorrow) };
+                }
+                case 'weekend': {
+                    const day = now.getDay();
+                    const daysUntilSaturday = (6 - day + 7) % 7;
+                    const saturday = new Date(start);
+                    saturday.setDate(start.getDate() + daysUntilSaturday);
+                    const sunday = new Date(saturday);
+                    sunday.setDate(saturday.getDate() + 1);
+                    return { start: saturday, end: endOfDay(sunday) };
+                }
+                default:
+                    return null;
+            }
+        }
+
+        function matchesNeighborhood(event, selectedNeighborhoods) {
+            if (!selectedNeighborhoods.length) return true;
+            if (!event.location) return false;
+
+            const location = event.location.toLowerCase();
+            return selectedNeighborhoods.some(area => {
+                const keywords = neighborhoodKeywords[area] || [area];
+                return keywords.some(keyword => location.includes(keyword));
+            });
+        }
+
+        function matchesPrice(event, selectedPrices) {
+            if (!selectedPrices.length) return true;
+
+            return selectedPrices.some(price => {
+                if (price === 'free') return !event.price || Number(event.price) === 0;
+                if (price === 'paid') return event.price && Number(event.price) > 0;
+                return true;
+            });
+        }
+
+        function matchesDate(event, dateFilter) {
+            if (!dateFilter) return true;
+
+            const range = getDateRange(dateFilter);
+            if (!range) return true;
+
+            const eventDate = new Date(event.event_date);
+            return eventDate >= range.start && eventDate <= range.end;
+        }
+
+        function filterEvents() {
+            const selected = getSelectedFilters();
+
+            mapEvents = allEvents.filter(event => {
+                const categoryMatch = !selected.categories.length || selected.categories.includes(event.category);
+                const neighborhoodMatch = matchesNeighborhood(event, selected.neighborhoods);
+                const priceMatch = matchesPrice(event, selected.prices);
+                const dateMatch = matchesDate(event, selected.date);
+
+                return categoryMatch && neighborhoodMatch && priceMatch && dateMatch;
+            });
+
+            renderEventsList();
+            renderActiveFilters(selected);
+        }
+
+        function getFilterLabel(input) {
+            const label = input.closest('label');
+            return label ? label.textContent.trim() : input.value;
+        }
+
+        function createFilterTag(label, type, value) {
+            const tag = document.createElement('div');
+            tag.className = 'filter-tag';
+            tag.textContent = label;
+
+            const button = document.createElement('button');
+            button.addEventListener('click', () => removeFilter(type, value));
+            button.innerHTML = `
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                </svg>
+            `;
+
+            tag.appendChild(button);
+            return tag;
+        }
+
+        function renderActiveFilters(selected) {
+            if (!activeFiltersEl) return;
+
+            activeFiltersEl.innerHTML = '';
+
+            const selectedCount = selected.categories.length + selected.neighborhoods.length + selected.prices.length + (selected.date ? 1 : 0);
+            const summary = document.createElement('span');
+            summary.style.fontSize = '0.8125rem';
+            summary.style.color = 'var(--muted-foreground)';
+            summary.textContent = selectedCount ? `${selectedCount} filtras${selectedCount > 1 ? 'i' : ''} taikoma` : 'Filtrai netaikomi';
+            activeFiltersEl.appendChild(summary);
+
+            if (!selectedCount) return;
+
+            if (selected.date) {
+                const input = document.querySelector(`input[name="date"][value="${selected.date}"]`);
+                activeFiltersEl.appendChild(createFilterTag(getFilterLabel(input), 'date', selected.date));
+            }
+
+            selected.categories.forEach(value => {
+                const input = document.querySelector(`input[name="category"][value="${value}"]`);
+                activeFiltersEl.appendChild(createFilterTag(getFilterLabel(input), 'category', value));
+            });
+
+            selected.neighborhoods.forEach(value => {
+                const input = document.querySelector(`input[name="neighborhood"][value="${value}"]`);
+                activeFiltersEl.appendChild(createFilterTag(getFilterLabel(input), 'neighborhood', value));
+            });
+
+            selected.prices.forEach(value => {
+                const input = document.querySelector(`input[name="price"][value="${value}"]`);
+                activeFiltersEl.appendChild(createFilterTag(getFilterLabel(input), 'price', value));
+            });
+
+            const clearBtn = document.createElement('button');
+            clearBtn.className = 'clear-all';
+            clearBtn.textContent = 'Išvalyti viską';
+            clearBtn.addEventListener('click', clearAllFilters);
+            activeFiltersEl.appendChild(clearBtn);
+        }
+
+        function removeFilter(type, value) {
+            const input = document.querySelector(`input[name="${type}"][value="${value}"]`);
+            if (input) {
+                input.checked = false;
+                filterEvents();
+            }
         }
 
         function clearAllFilters() {
-            document.querySelectorAll('.filter-option input').forEach(input => {
+            filterInputs.forEach(input => {
                 input.checked = false;
             });
-            document.querySelector('.active-filters').innerHTML = '';
+
+            filterEvents();
+        }
+
+        function attachFilterListeners() {
+            filterInputs.forEach(input => {
+                input.addEventListener('change', filterEvents);
+            });
         }
 
         async function loadCityMapEvents() {
@@ -328,15 +509,16 @@
                     fetchUserFavorites(),
                 ]);
 
-                mapEvents = events && events.length ? events : getKnownEvents();
+                allEvents = events && events.length ? events : getKnownEvents();
             } catch (error) {
                 console.error('Nepavyko užkrauti renginių:', error);
-                mapEvents = getKnownEvents();
+                allEvents = getKnownEvents();
             }
 
-            renderEventsList();
+            filterEvents();
         }
 
+        attachFilterListeners();
         loadCityMapEvents();
     </script>
 </body>
