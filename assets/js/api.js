@@ -45,21 +45,18 @@ function cacheKeyFor(resource) {
     return CACHE_KEYS[resource] || resource;
 }
 
-async function fetchWithCache(resource, params = {}, fallback = []) {
+async function fetchWithCache(resource, params = {}) {
     const query = buildQuery({ resource, ...params });
     const cacheKey = cacheKeyFor(resource);
+    const cached = readCache(cacheKey);
     try {
         const data = await fetchJSON(`${API_BASE}?${query}`);
         const payload = data[resource] || data.events || data.notifications || [];
         writeCache(cacheKey, payload);
         return { data: payload, error: null };
     } catch (error) {
-        const cached = readCache(cacheKey);
         if (cached.length) {
             return { data: cached, error };
-        }
-        if (fallback.length) {
-            return { data: fallback, error };
         }
         throw error;
     }
@@ -74,8 +71,8 @@ function getCachedNotifications() {
 }
 
 const apiService = {
-    getEvents: (params = {}, fallback = []) => fetchWithCache('events', params, fallback),
-    getNotifications: (params = {}, fallback = []) => fetchWithCache('notifications', params, fallback),
+    getEvents: (params = {}) => fetchWithCache('events', params),
+    getNotifications: (params = {}) => fetchWithCache('notifications', params),
     getCachedEvents,
     getCachedNotifications,
 };

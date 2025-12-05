@@ -227,6 +227,25 @@ try {
                 save_data($dataFile, $data);
                 respond(['event' => $new]);
             }
+            if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+                $eventId = $input['id'] ?? null;
+                if (!$eventId) {
+                    respond(['error' => 'Trūksta renginio ID'], 400);
+                }
+
+                $allowedKeys = ['title', 'description', 'category', 'location', 'lat', 'lng', 'event_date', 'price', 'status', 'cover_image'];
+                foreach ($data['events'] as &$event) {
+                    if ((string)$event['id'] === (string)$eventId) {
+                        $event = array_merge($event, array_filter($input, function ($value, $key) use ($allowedKeys) {
+                            return in_array($key, $allowedKeys, true) && $value !== null && $value !== '';
+                        }, ARRAY_FILTER_USE_BOTH));
+                        save_data($dataFile, $data);
+                        respond(['event' => $event]);
+                    }
+                }
+
+                respond(['error' => 'Renginys nerastas'], 404);
+            }
             respond(['error' => 'Nepalaikomas metodas'], 405);
 
         case 'notifications':
