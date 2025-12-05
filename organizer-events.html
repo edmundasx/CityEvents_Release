@@ -13,7 +13,7 @@
     <header class="header">
         <div class="header-content">
             <div class="header-left">
-                <a href="index.html" class="logo">🎉 CityEvents</a>
+                <a href="index.html" class="logo">CityEvents</a>
                 <nav class="nav">
                     <a href="index.html" class="nav-link">Naršyti renginius</a>
                     <a href="create-event.html" class="nav-link">Sukurti renginį</a>
@@ -22,11 +22,7 @@
                 </nav>
             </div>
             <div class="header-right">
-                <div class="user-menu">
-                    <!-- User menu content if needed, or just profile -->
-                    <!-- For consistency with dashboard -->
-                     <div style="width: 32px; height: 32px; background: #667eea; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">JD</div>
-                </div>
+                <div class="header-actions" id="authActions"></div>
             </div>
         </div>
     </header>
@@ -60,6 +56,8 @@
         </div>
     </div>
 
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
     <script>
         // Mockup data - organizatoriaus pateikti renginiai
         const organizerEvents = [

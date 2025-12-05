@@ -897,7 +897,12 @@ async function loadEventDetails() {
             features.appendChild(li);
         });
 
-        document.getElementById('btnAttend').onclick = () => toggleFavorite(event.id, 'going');
+        const ticketBtn = document.getElementById('btnAttend');
+        if (ticketBtn) {
+            ticketBtn.onclick = () => {
+                window.open('https://www.tiketa.lt', '_blank', 'noopener');
+            };
+        }
         document.getElementById('btnFavorite').onclick = () => toggleFavorite(event.id, 'favorite');
     } catch (err) {
         const fallback = getKnownEvents().find(ev => String(ev.id) === String(eventId));
@@ -916,6 +921,12 @@ async function loadEventDetails() {
             document.getElementById('eventOrganizer').textContent = fallback.organizer_name || 'Organizatorius';
             document.getElementById('eventStatus').textContent = formatStatus(fallback.status);
             document.getElementById('organizerAvatar').textContent = (fallback.organizer_name || 'CE').slice(0, 2).toUpperCase();
+            const ticketBtn = document.getElementById('btnAttend');
+            if (ticketBtn) {
+                ticketBtn.onclick = () => {
+                    window.open('https://www.tiketa.lt', '_blank', 'noopener');
+                };
+            }
         } else {
             const container = document.getElementById('eventContainer');
             if (container) container.innerHTML = `<div class="loading">${err.message}</div>`;
