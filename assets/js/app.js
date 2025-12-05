@@ -1,5 +1,62 @@
 const USER_STORAGE_KEY = 'cityevents_user';
 
+const demoEvents = [
+    {
+        id: 1,
+        organizer_id: 2,
+        organizer_name: 'Organizatorius',
+        title: 'Miesto mugė',
+        description: 'Sezoninė miesto mugė su vietiniais gamintojais ir scena',
+        category: 'food',
+        location: 'Rotušės aikštė',
+        lat: 54.6872,
+        lng: 25.2797,
+        event_date: new Date(Date.now() + 7 * 86400_000).toISOString(),
+        price: 0,
+        status: 'approved',
+        cover_image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80',
+    },
+    {
+        id: 2,
+        organizer_id: 2,
+        organizer_name: 'Organizatorius',
+        title: 'Technologijų vakaras',
+        description: 'Diskusijos ir dirbtuvės apie inovacijas',
+        category: 'business',
+        location: 'Technopolis Vilnius',
+        lat: 54.669,
+        lng: 25.2747,
+        event_date: new Date(Date.now() + 14 * 86400_000).toISOString(),
+        price: 15,
+        status: 'pending',
+        cover_image: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=900&q=80',
+    },
+    {
+        id: 3,
+        organizer_id: 2,
+        organizer_name: 'Organizatorius',
+        title: 'Muzikos piknikas',
+        description: 'Gyva muzika parke ir maisto furgonai',
+        category: 'music',
+        location: 'Bernardinų sodas',
+        lat: 54.684,
+        lng: 25.29,
+        event_date: new Date(Date.now() + 3 * 86400_000).toISOString(),
+        price: 5,
+        status: 'approved',
+        cover_image: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=900&q=80',
+    },
+];
+
+const apiClient = window.apiService || {
+    getEvents: async () => ({ data: demoEvents, error: null }),
+    getNotifications: async () => ({ data: [], error: null }),
+    getCachedEvents: () => demoEvents,
+    getCachedNotifications: () => [],
+};
+
+window.apiService = window.apiService || apiClient;
+
 function parseStoredJSON(key, fallback = null) {
     const raw = localStorage.getItem(key);
     if (!raw) return fallback;
@@ -23,7 +80,7 @@ const state = {
 };
 
 function getKnownEvents(filters = {}) {
-    let events = state.events.length ? state.events : apiService.getCachedEvents();
+    let events = state.events.length ? state.events : apiClient.getCachedEvents();
 
     if (filters.category) {
         events = events.filter(e => e.category === filters.category);
@@ -38,9 +95,9 @@ async function ensureEventsLoaded(params = {}) {
         return state.events;
     }
 
-    const cached = apiService.getCachedEvents();
+    const cached = apiClient.getCachedEvents();
     try {
-        const { data } = await apiService.getEvents(params);
+        const { data } = await apiClient.getEvents(params);
         const events = data || [];
         if (!hasFilters) {
             state.events = events;
@@ -60,9 +117,9 @@ async function ensureEventsLoaded(params = {}) {
 async function ensureNotificationsLoaded() {
     if (state.notifications.length) return state.notifications;
 
-    const cached = apiService.getCachedNotifications();
+    const cached = apiClient.getCachedNotifications();
     try {
-        const { data } = await apiService.getNotifications();
+        const { data } = await apiClient.getNotifications();
         state.notifications = data || [];
     } catch (err) {
         if (cached.length) {
