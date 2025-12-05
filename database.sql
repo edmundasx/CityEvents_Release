@@ -66,6 +66,7 @@ INSERT INTO users (name, email, password, role) VALUES
 ('Asta Vartotoja', 'asta@cityevents.lt', 'slaptas', 'user'),
 ('Jonas Organizatorius', 'jonas@cityevents.lt', 'organizer', 'organizer'),
 ('Ieva Administratore', 'ieva@cityevents.lt', 'admin', 'admin'),
+('Admin Pavyzdys', 'admin@cityevents.lt', 'labai-slapta', 'admin'),
 ('Mantas Petrauskas', 'mantas@cityevents.lt', 'slaptas', 'user'),
 ('Rasa Zukauskaite', 'rasa@cityevents.lt', 'slaptas', 'user'),
 ('Simona Laurinaite', 'simona@cityevents.lt', 'organizer', 'organizer'),
