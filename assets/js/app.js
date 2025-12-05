@@ -81,6 +81,9 @@ const state = {
 
 function getKnownEvents(filters = {}) {
     let events = state.events.length ? state.events : apiClient.getCachedEvents();
+    if (!events.length) {
+        events = demoEvents;
+    }
 
     if (filters.category) {
         events = events.filter(e => e.category === filters.category);
@@ -104,13 +107,11 @@ async function ensureEventsLoaded(params = {}) {
         }
         return events;
     } catch (error) {
-        if (cached.length) {
-            if (!hasFilters && !state.events.length) {
-                state.events = cached;
-            }
-            return cached;
+        const fallback = cached.length ? cached : demoEvents;
+        if (!hasFilters && fallback.length && !state.events.length) {
+            state.events = fallback;
         }
-        throw error;
+        return fallback;
     }
 }
 
