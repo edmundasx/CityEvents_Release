@@ -484,11 +484,11 @@ function renderAuthActions() {
     const initial = name.charAt(0).toUpperCase();
 
     const organizerLink = user.role === 'organizer' || user.role === 'admin'
-        ? '<a class="btn btn-outline" href="organizer-events.html">Organizatoriaus zona</a>'
+        ? '<a class="btn btn-outline" href="organizer-dashboard.html">Organizatoriaus zona</a>'
         : '';
 
     const adminLink = user.role === 'admin'
-        ? '<a class="btn btn-outline" href="admin.html">Admin panelis</a>'
+        ? '<a class="btn btn-outline" href="admin-panel.html">Admin panelis</a>'
         : '';
 
     container.innerHTML = `
@@ -499,7 +499,7 @@ function renderAuthActions() {
                 <div class="user-role">${roleLabel}</div>
             </div>
         </div>
-        <a class="btn btn-outline" href="user-panel.html">Mano renginiai</a>
+        <a class="btn btn-outline" href="attender-panel.html">Mano renginiai</a>
         <a class="btn btn-outline" href="edit-profile.html">Redaguoti profilį</a>
         ${organizerLink}
         ${adminLink}
@@ -510,28 +510,51 @@ function renderAuthActions() {
     logoutBtn?.addEventListener('click', () => {
         localStorage.removeItem(USER_STORAGE_KEY);
         renderAuthActions();
-        if (window.location.pathname.includes('user-panel') || window.location.pathname.includes('organizer')) {
+        if (window.location.pathname.includes('attender-panel') ||
+            window.location.pathname.includes('organizer') ||
+            window.location.pathname.includes('admin-panel')) {
             window.location.href = 'index.html';
         }
     });
 }
 
 function syncNavRoleLinks(user) {
-    document.querySelectorAll('.nav').forEach(nav => {
-        let adminLink = nav.querySelector('[data-nav-admin]');
+    const rolePanels = {
+        admin: {
+            href: 'admin-panel.html',
+            label: 'Admin panelis',
+        },
+        organizer: {
+            href: 'organizer-dashboard.html',
+            label: 'Organizatoriaus panelis',
+        },
+        user: {
+            href: 'attender-panel.html',
+            label: 'Dalyvio panelis',
+        },
+        attender: {
+            href: 'attender-panel.html',
+            label: 'Dalyvio panelis',
+        },
+    };
 
-        if (user?.role === 'admin') {
-            if (!adminLink) {
-                adminLink = document.createElement('a');
-                adminLink.href = 'admin.html';
-                adminLink.textContent = 'Admin panelis';
-                adminLink.setAttribute('data-nav-admin', 'true');
-                nav.appendChild(adminLink);
-            } else {
-                adminLink.style.removeProperty('display');
+    document.querySelectorAll('.nav').forEach(nav => {
+        nav.querySelector('[data-nav-admin]')?.remove();
+
+        let panelLink = nav.querySelector('[data-nav-panel]');
+        const roleConfig = user ? rolePanels[user.role] : null;
+
+        if (roleConfig) {
+            if (!panelLink) {
+                panelLink = document.createElement('a');
+                panelLink.className = 'nav-link';
+                panelLink.setAttribute('data-nav-panel', 'true');
+                nav.appendChild(panelLink);
             }
-        } else if (adminLink) {
-            adminLink.remove();
+            panelLink.href = roleConfig.href;
+            panelLink.textContent = roleConfig.label;
+        } else if (panelLink) {
+            panelLink.remove();
         }
     });
 }
