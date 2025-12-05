@@ -19,39 +19,39 @@ class Event
 
     public function findAll(array $filters = []): array
     {
-        $query = 'SELECT * FROM events WHERE 1=1';
+        $query = 'SELECT e.*, u.name as organizer_name FROM events e JOIN users u ON e.organizer_id = u.id WHERE 1=1';
         $params = [];
 
         if (!empty($filters['id'])) {
-            $query .= ' AND id = :id';
+            $query .= ' AND e.id = :id';
             $params[':id'] = $filters['id'];
         }
 
         if (!empty($filters['organizer_id'])) {
-            $query .= ' AND organizer_id = :organizer_id';
+            $query .= ' AND e.organizer_id = :organizer_id';
             $params[':organizer_id'] = $filters['organizer_id'];
         }
 
         if (!empty($filters['category'])) {
-            $query .= ' AND category = :category';
+            $query .= ' AND e.category = :category';
             $params[':category'] = $filters['category'];
         }
 
         if (!empty($filters['search'])) {
-            $query .= ' AND (LOWER(title) LIKE :search OR LOWER(description) LIKE :search)';
+            $query .= ' AND (LOWER(e.title) LIKE :search OR LOWER(e.description) LIKE :search)';
             $params[':search'] = '%' . mb_strtolower($filters['search']) . '%';
         }
 
         if (!empty($filters['location'])) {
-            $query .= ' AND LOWER(location) LIKE :location';
+            $query .= ' AND LOWER(e.location) LIKE :location';
             $params[':location'] = '%' . mb_strtolower($filters['location']) . '%';
         }
 
         if (empty($filters['include_all'])) {
-            $query .= " AND status = 'approved'";
+            $query .= " AND e.status = 'approved'";
         }
 
-        $query .= ' ORDER BY event_date ASC';
+        $query .= ' ORDER BY e.event_date ASC';
 
         $statement = $this->pdo->prepare($query);
         $statement->execute($params);
@@ -60,22 +60,13 @@ class Event
 
     public function create(array $data): ?array
     {
-        $organizerName = 'Organizatorius';
-        $userLookup = $this->pdo->prepare('SELECT name FROM users WHERE id = :id LIMIT 1');
-        $userLookup->execute([':id' => $data['organizer_id']]);
-        $userRow = $userLookup->fetch();
-        if ($userRow && !empty($userRow['name'])) {
-            $organizerName = $userRow['name'];
-        }
-
         $statement = $this->pdo->prepare(
-            'INSERT INTO events (organizer_id, organizer_name, title, description, category, location, lat, lng, event_date, price, status, cover_image) ' .
-            'VALUES (:organizer_id, :organizer_name, :title, :description, :category, :location, :lat, :lng, :event_date, :price, :status, :cover_image)'
+            'INSERT INTO events (organizer_id, title, description, category, location, lat, lng, event_date, price, status, cover_image) ' .
+            'VALUES (:organizer_id, :title, :description, :category, :location, :lat, :lng, :event_date, :price, :status, :cover_image)'
         );
 
         $payload = [
             ':organizer_id' => $data['organizer_id'],
-            ':organizer_name' => $organizerName,
             ':title' => trim($data['title']),
             ':description' => trim($data['description']),
             ':category' => $data['category'],

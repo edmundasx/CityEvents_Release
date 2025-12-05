@@ -10,6 +10,7 @@ CREATE TABLE users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
     email VARCHAR(190) NOT NULL UNIQUE,
+    -- Passwords should be hashed using password_hash() in PHP
     password VARCHAR(255) NOT NULL,
     role ENUM('user', 'organizer', 'admin') NOT NULL DEFAULT 'user',
     phone VARCHAR(50) NULL,
@@ -21,7 +22,6 @@ CREATE TABLE users (
 CREATE TABLE events (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     organizer_id BIGINT UNSIGNED NOT NULL,
-    organizer_name VARCHAR(150) NOT NULL,
     title VARCHAR(200) NOT NULL,
     description TEXT NOT NULL,
     category VARCHAR(60) NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE favorites (
 CREATE INDEX idx_favorites_user ON favorites (user_id);
 CREATE INDEX idx_favorites_event ON favorites (event_id);
 
--- Blocked users (stored separately to mirror PHP data.json structure)
+-- Blocked users
 CREATE TABLE blocked_users (
     user_id BIGINT UNSIGNED PRIMARY KEY,
     blocked_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -62,6 +62,7 @@ CREATE TABLE blocked_users (
 );
 
 -- Seed users (Lithuanian names)
+-- In a real application, passwords would be hashed. e.g., password_hash('secret', PASSWORD_DEFAULT)
 INSERT INTO users (name, email, password, role) VALUES
 ('Asta Vartotoja', 'asta@cityevents.lt', 'slaptas', 'user'),
 ('Jonas Organizatorius', 'jonas@cityevents.lt', 'organizer', 'organizer'),
@@ -76,17 +77,17 @@ INSERT INTO users (name, email, password, role) VALUES
 ('Egle Simkute', 'egle@cityevents.lt', 'slaptas', 'user');
 
 -- Seed events (dates relative to load time to mimic current/future/past cases)
-INSERT INTO events (organizer_id, organizer_name, title, description, category, location, lat, lng, event_date, price, status, cover_image) VALUES
-(2, 'Jonas Organizatorius', 'Vilniaus gatves muzikos diena', 'Gyvos muzikos koncertai Gedimino prospekte', 'music', 'Vilnius, Gedimino pr. 22', 54.689159, 25.276955, DATE_ADD(NOW(), INTERVAL 5 DAY), 0.00, 'approved', 'https://images.unsplash.com/photo-1506156886591-1f54be9ea5f1?auto=format&fit=crop&w=900&q=80'),
-(2, 'Jonas Organizatorius', 'Neries vakarinis begimas', '10 km trasos palei upę su DJ zona finiše', 'sports', 'Vilnius, Neries krantine', 54.699921, 25.268493, DATE_ADD(NOW(), INTERVAL -3 DAY), 0.00, 'approved', 'https://images.unsplash.com/photo-1508609349937-5ec4ae374ebf?auto=format&fit=crop&w=900&q=80'),
-(6, 'Simona Laurinaite', 'Kauno menų naktys', 'Instaliacijos ir performansai Laisvės alėjoje', 'arts', 'Kaunas, Laisves al. 68', 54.898521, 23.912289, DATE_ADD(NOW(), INTERVAL 12 DAY), 6.50, 'approved', 'https://images.unsplash.com/photo-1517602302552-471fe67acf66?auto=format&fit=crop&w=900&q=80'),
-(9, 'Aurimas Kavaliauskas', 'Klaipedos jūros šventė', 'Laivų paradas, mugė ir koncertai prie marių', 'festival', 'Klaipeda, Kruiziniu laivu terminalas', 55.710803, 21.127880, DATE_ADD(NOW(), INTERVAL 30 DAY), 0.00, 'pending', 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80'),
-(6, 'Simona Laurinaite', 'Panevezio teatro vakaras', 'Jaunimo teatro trupės spektaklis', 'arts', 'Panevezys, Respublikos g. 40', 55.733472, 24.357477, DATE_ADD(NOW(), INTERVAL 2 DAY), 9.00, 'approved', 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=80'),
-(9, 'Aurimas Kavaliauskas', 'Siauliu saulės džiazas', 'Vasaros džiazo koncertas skvere', 'music', 'Siauliai, Vilniaus g. 213', 55.935617, 23.313073, DATE_ADD(NOW(), INTERVAL -14 DAY), 4.00, 'approved', 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=900&q=80'),
-(2, 'Jonas Organizatorius', 'Trakų pilies regata', 'Valčių lenktynės ir maisto vagonėliai Galvės ežere', 'sports', 'Trakai, Karaimu g. 53', 54.646227, 24.933012, DATE_ADD(NOW(), INTERVAL 18 DAY), 7.00, 'pending', 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80'),
-(6, 'Simona Laurinaite', 'Alytaus miesto piknikas', 'Šeimų piknikas su edukacinėmis dirbtuvėmis', 'family', 'Alytus, J. Basanaviciaus g. 5', 54.399222, 24.046474, DATE_ADD(NOW(), INTERVAL 7 DAY), 3.00, 'approved', 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80'),
-(9, 'Aurimas Kavaliauskas', 'Utenos kulinarinis savaitgalis', 'Regioninių patiekalų ragavimas ir konkursas', 'food', 'Utena, S. Dariaus ir S. Gireno g. 14', 55.493115, 25.594767, DATE_ADD(NOW(), INTERVAL 40 DAY), 5.00, 'pending', 'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?auto=format&fit=crop&w=900&q=80'),
-(6, 'Simona Laurinaite', 'Marijampoles kino vakarai', 'Lietuviškų filmų retrospektyva po atviru dangumi', 'arts', 'Marijampole, J. Basanaviciaus a. 4', 54.559600, 23.354116, DATE_ADD(NOW(), INTERVAL -1 DAY), 2.00, 'approved', 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80');
+INSERT INTO events (organizer_id, title, description, category, location, lat, lng, event_date, price, status, cover_image) VALUES
+(2, 'Vilniaus gatves muzikos diena', 'Gyvos muzikos koncertai Gedimino prospekte', 'music', 'Vilnius, Gedimino pr. 22', 54.689159, 25.276955, DATE_ADD(NOW(), INTERVAL 5 DAY), 0.00, 'approved', 'https://images.unsplash.com/photo-1506156886591-1f54be9ea5f1?auto=format&fit=crop&w=900&q=80'),
+(2, 'Neries vakarinis begimas', '10 km trasos palei upę su DJ zona finiše', 'sports', 'Vilnius, Neries krantine', 54.699921, 25.268493, DATE_ADD(NOW(), INTERVAL -3 DAY), 0.00, 'approved', 'https://images.unsplash.com/photo-1508609349937-5ec4ae374ebf?auto=format&fit=crop&w=900&q=80'),
+(7, 'Kauno menų naktys', 'Instaliacijos ir performansai Laisvės alėjoje', 'arts', 'Kaunas, Laisves al. 68', 54.898521, 23.912289, DATE_ADD(NOW(), INTERVAL 12 DAY), 6.50, 'approved', 'https://images.unsplash.com/photo-1517602302552-471fe67acf66?auto=format&fit=crop&w=900&q=80'),
+(10, 'Klaipedos jūros šventė', 'Laivų paradas, mugė ir koncertai prie marių', 'festival', 'Klaipeda, Kruiziniu laivu terminalas', 55.710803, 21.127880, DATE_ADD(NOW(), INTERVAL 30 DAY), 0.00, 'approved', 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80'),
+(7, 'Panevezio teatro vakaras', 'Jaunimo teatro trupės spektaklis', 'arts', 'Panevezys, Respublikos g. 40', 55.733472, 24.357477, DATE_ADD(NOW(), INTERVAL 2 DAY), 9.00, 'approved', 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=80'),
+(10, 'Siauliu saulės džiazas', 'Vasaros džiazo koncertas skvere', 'music', 'Siauliai, Vilniaus g. 213', 55.935617, 23.313073, DATE_ADD(NOW(), INTERVAL -14 DAY), 4.00, 'approved', 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=900&q=80'),
+(2, 'Trakų pilies regata', 'Valčių lenktynės ir maisto vagonėliai Galvės ežere', 'sports', 'Trakai, Karaimu g. 53', 54.646227, 24.933012, DATE_ADD(NOW(), INTERVAL 18 DAY), 7.00, 'approved', 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80'),
+(7, 'Alytaus miesto piknikas', 'Šeimų piknikas su edukacinėmis dirbtuvėmis', 'family', 'Alytus, J. Basanaviciaus g. 5', 54.399222, 24.046474, DATE_ADD(NOW(), INTERVAL 7 DAY), 3.00, 'approved', 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80'),
+(10, 'Utenos kulinarinis savaitgalis', 'Regioninių patiekalų ragavimas ir konkursas', 'food', 'Utena, S. Dariaus ir S. Gireno g. 14', 55.493115, 25.594767, DATE_ADD(NOW(), INTERVAL 40 DAY), 5.00, 'approved', 'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?auto=format&fit=crop&w=900&q=80'),
+(7, 'Marijampoles kino vakarai', 'Lietuviškų filmų retrospektyva po atviru dangumi', 'arts', 'Marijampole, J. Basanaviciaus a. 4', 54.559600, 23.354116, DATE_ADD(NOW(), INTERVAL -1 DAY), 2.00, 'approved', 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80');
 
 -- Seed favorites (10+ entries referencing existing users/events)
 INSERT INTO favorites (event_id, user_id, tag, created_at) VALUES
@@ -100,16 +101,3 @@ INSERT INTO favorites (event_id, user_id, tag, created_at) VALUES
 (8, 9, 'seima', DATE_ADD(NOW(), INTERVAL -9 DAY)),
 (9, 6, 'maistas', DATE_ADD(NOW(), INTERVAL -10 DAY)),
 (10, 2, 'kino', DATE_ADD(NOW(), INTERVAL -11 DAY));
-
--- Seed blocked users (all current users for completeness)
-INSERT INTO blocked_users (user_id, blocked_at) VALUES
-(1, DATE_ADD(NOW(), INTERVAL -30 DAY)),
-(2, DATE_ADD(NOW(), INTERVAL -29 DAY)),
-(3, DATE_ADD(NOW(), INTERVAL -28 DAY)),
-(4, DATE_ADD(NOW(), INTERVAL -27 DAY)),
-(5, DATE_ADD(NOW(), INTERVAL -26 DAY)),
-(6, DATE_ADD(NOW(), INTERVAL -25 DAY)),
-(7, DATE_ADD(NOW(), INTERVAL -24 DAY)),
-(8, DATE_ADD(NOW(), INTERVAL -23 DAY)),
-(9, DATE_ADD(NOW(), INTERVAL -22 DAY)),
-(10, DATE_ADD(NOW(), INTERVAL -21 DAY));

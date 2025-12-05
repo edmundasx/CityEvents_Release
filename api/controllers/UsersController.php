@@ -48,6 +48,9 @@ function handleUsers(string $method, array $input): void
                 return;
             }
 
+            // Hash the password before creating the user
+            $input['password'] = password_hash($input['password'], PASSWORD_DEFAULT);
+
             $user = $userModel->create($input);
             if ($user) {
                 respond(['user' => sanitize_user($user)], 201);
@@ -72,6 +75,11 @@ function handleUsers(string $method, array $input): void
             if (isset($input['role']) && $input['role'] !== '' && !validate_user_role($input['role'])) {
                 respond(['error' => 'Neteisinga rolė'], 400);
                 return;
+            }
+
+            // If the password is being updated, hash the new password
+            if (!empty($input['password'])) {
+                $input['password'] = password_hash($input['password'], PASSWORD_DEFAULT);
             }
 
             $user = $userModel->update((int)$id, $input);

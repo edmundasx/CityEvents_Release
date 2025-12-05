@@ -47,11 +47,12 @@ const demoEvents = [
         cover_image: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=900&q=80',
     },
 ];
+window.demoEvents = demoEvents; // Make demo events globally accessible as a fallback
 
 const apiClient = window.apiService || {
-    getEvents: async () => ({ data: demoEvents, error: null }),
+    getEvents: async () => ({ data: window.demoEvents, error: null }),
     getNotifications: async () => ({ data: [], error: null }),
-    getCachedEvents: () => demoEvents,
+    getCachedEvents: () => window.demoEvents,
     getCachedNotifications: () => [],
 };
 
@@ -82,7 +83,7 @@ const state = {
 function getKnownEvents(filters = {}) {
     let events = state.events.length ? state.events : apiClient.getCachedEvents();
     if (!events.length) {
-        events = demoEvents;
+        events = window.demoEvents;
     }
 
     if (filters.category) {
@@ -107,7 +108,7 @@ async function ensureEventsLoaded(params = {}) {
         }
         return events;
     } catch (error) {
-        const fallback = cached.length ? cached : demoEvents;
+        const fallback = cached.length ? cached : window.demoEvents;
         if (!hasFilters && fallback.length && !state.events.length) {
             state.events = fallback;
         }
@@ -1292,7 +1293,7 @@ function initOrganizerEditForm() {
     const message = document.getElementById('editEventMessage');
     if (!form || !message) return;
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         message.textContent = '';
 
@@ -1675,44 +1676,52 @@ function initHomePage() {
 }
 
 function init() {
-    const page = document.body.dataset.page;
-    const isSignupPage = page === 'signup';
+    try {
+        const page = document.body.dataset.page;
+        const isSignupPage = page === 'signup';
 
-    if (!isSignupPage) {
-        ensureAuthContainer();
+        if (!isSignupPage) {
+            ensureAuthContainer();
+            initLoginModal();
+            initSignupModal();
+            bindLoginTriggers();
+            bindSignupTriggers();
+            renderAuthActions();
+        }
 
-        initLoginModal();
-        initSignupModal();
-        bindLoginTriggers();
-        bindSignupTriggers();
-        renderAuthActions();
-    }
-    switch (page) {
-        case 'home':
-            initHomePage();
-            break;
-        case 'details':
-            loadEventDetails();
-            break;
-        case 'signup':
-            handleSignup();
-            break;
-        case 'admin':
-            loadAdminPage();
-            break;
-        case 'user-profile':
-            loadUserProfilePage();
-            break;
-        case 'user-panel':
-            loadUserDashboard();
-            break;
-        case 'organizer-profile':
-            loadOrganizerProfilePage();
-            break;
-        case 'organizer-events':
-            loadOrganizerEventsBoard();
-            initOrganizerEditForm();
-            break;
+        switch (page) {
+            case 'home':
+                initHomePage();
+                break;
+            case 'details':
+                loadEventDetails();
+                break;
+            case 'signup':
+                handleSignup();
+                break;
+            case 'admin':
+                loadAdminPage();
+                break;
+            case 'user-profile':
+                loadUserProfilePage();
+                break;
+            case 'user-panel':
+                loadUserDashboard();
+                break;
+            case 'organizer-profile':
+                loadOrganizerProfilePage();
+                break;
+            case 'organizer-events':
+                loadOrganizerEventsBoard();
+                initOrganizerEditForm();
+                break;
+        }
+    } catch (e) {
+        console.error("A critical error occurred during initialization:", e);
+        const grid = document.getElementById('eventsGrid');
+        if (grid) {
+            grid.innerHTML = `<div class="loading" style="color: red;">Klaida! Nepavyko paleisti programos. Patikrinkite naršyklės konsolę.</div>`;
+        }
     }
 }
 

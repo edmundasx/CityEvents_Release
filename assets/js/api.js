@@ -77,6 +77,8 @@ const apiService = {
     getCachedNotifications,
 };
 
+// Make key variables globally accessible
+window.API_BASE = API_BASE;
 window.apiService = apiService;
 window.buildQuery = buildQuery;
 window.fetchJSON = fetchJSON;
