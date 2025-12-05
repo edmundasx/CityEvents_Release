@@ -1,3 +1,26 @@
+/* ===== GLOBAL RESET & BASE ===== */
+:root {
+    --primary: #ff6b35;
+    --primary-hover: #e85a2a;
+    --secondary: #333;
+    --background: #f8f9fa;
+    --foreground: #333;
+    --muted: #6c757d;
+    --muted-foreground: #64748b;
+    --border: #e5e7eb;
+    --white: #ffffff;
+    --card: #ffffff;
+    --card-foreground: #333;
+    --accent: #f1f5f9;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --radius: 0.5rem;
+    --input: #e5e7eb;
+    
+    /* Fonts */
+    --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -5,13 +28,13 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--font-main);
     line-height: 1.6;
-    color: #333;
-    background: #f8f9fa;
+    color: var(--foreground);
+    background: var(--background);
 }
 
-/* Header */
+/* ===== HEADER ===== */
 .header {
     background: white;
     border-bottom: 1px solid #e5e7eb;
@@ -89,7 +112,7 @@ body {
     color: #ff6b35;
 }
 
-/* Buttons */
+/* ===== BUTTONS ===== */
 .btn {
     padding: 0.5rem 1.5rem;
     border: none;
@@ -137,7 +160,7 @@ body {
 .pill, .badge.pill { background: #fff0e6; color: #ff6b35; border-radius: 999px; padding: 0.25rem 0.75rem; font-weight: 600; }
 .badge.pill { text-transform: capitalize; }
 
-/* Hero */
+/* ===== HERO (HOME PAGE) ===== */
 .hero {
     color: white;
     padding: 5rem 1.5rem;
@@ -178,19 +201,17 @@ body {
     font-size: 3rem;
     margin-bottom: 1rem;
     font-weight: 700;
-    -webkit-text-stroke: 1px #000;
-    text-stroke: 1px #000;
+    color: var(--foreground);
 }
 
 .hero p {
     font-size: 1.25rem;
     margin-bottom: 2rem;
     opacity: 0.95;
-    -webkit-text-stroke: 1px #000;
-    text-stroke: 1px #000;
+    color: var(--muted-foreground);
 }
 
-/* Search */
+/* ===== SEARCH BAR ===== */
 .search-box {
     background: white;
     padding: 1rem;
@@ -217,7 +238,7 @@ body {
     border-color: #ff6b35;
 }
 
-/* Categories */
+/* ===== CATEGORIES ===== */
 .categories {
     background: white;
     padding: 2rem 1.5rem;
@@ -259,7 +280,7 @@ body {
     color: #333;
 }
 
-/* Events */
+/* ===== EVENTS GRID (HOME) ===== */
 .events-section {
     max-width: 1200px;
     margin: 0 auto;
@@ -312,7 +333,8 @@ body {
     background: #e5e7eb;
 }
 
-.event-content {
+/* Important: scoped to cards so we can reuse .event-content on event details page */
+.event-card .event-content {
     padding: 1.25rem;
 }
 
@@ -402,7 +424,7 @@ body[data-page="home"] .status-badge {
 .status-approved { background: #ecfdf3; color: #15803d; }
 .status-rejected { background: #fef2f2; color: #dc2626; }
 
-/* Actions / forms */
+/* ===== ACTIONS / FORMS (CREATE EVENT SECTION) ===== */
 .actions {
     background: #fff;
     padding: 3rem 1.5rem;
@@ -488,7 +510,7 @@ body[data-page="home"] .status-badge {
 
 .map { height: 320px; border-radius: 0.75rem; }
 
-/* Page layout */
+/* ===== PAGE LAYOUT HELPERS ===== */
 .page {
     max-width: 960px;
     margin: 2.5rem auto 3rem;
@@ -528,7 +550,7 @@ body[data-page="home"] .status-badge {
     margin: 0 auto;
 }
 
-/* Login modal */
+/* ===== LOGIN MODAL ===== */
 .login-modal {
     position: fixed;
     inset: 0;
@@ -650,7 +672,7 @@ body[data-page="home"] .status-badge {
     color: #0f172a;
 }
 
-/* Signup modal */
+/* ===== SIGNUP MODAL (OVERLAY VERSION) ===== */
 .signup-modal .registration-container {
     max-width: 520px;
     width: 100%;
@@ -797,7 +819,7 @@ body[data-page="home"] .status-badge {
     font-size: 0.9rem;
 }
 
-/* Organizer dashboard visuals */
+/* ===== ORGANIZER / DASHBOARD VISUALS ===== */
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -864,7 +886,7 @@ body[data-page="home"] .status-badge {
     align-items: center;
 }
 
-/* Responsive */
+/* ===== RESPONSIVE (GLOBAL) ===== */
 @media (max-width: 900px) {
     .hero h1 { font-size: 2.4rem; }
     .section-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
@@ -887,7 +909,7 @@ body[data-page="home"] .status-badge {
     .page-header .btn { width: 100%; text-align: center; }
 }
 
-/* Dashboard helpers */
+/* ===== DASHBOARD HELPERS ===== */
 .list-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; align-items: stretch; }
 .list-columns.three { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
 .list-columns.three > div { display: flex; flex-direction: column; gap: 0.75rem; }
@@ -931,10 +953,11 @@ body[data-page="home"] .status-badge {
 .calendar-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; background: #fdf2e9; }
 .profile-form { display: flex; flex-direction: column; gap: 0.75rem; }
 .profile-form input { padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; }
-/* ===== Footer ===== */
+
+/* ===== FOOTER ===== */
 .footer {
     margin-top: 3rem;
-    background: #111827;          /* dark slate */
+    background: #111827;
     color: #9ca3af;
 }
 
@@ -1038,5 +1061,1476 @@ body[data-page="home"] .status-badge {
 
     .footer-bottom {
         text-align: left;
+    }
+}
+
+/* =========================================================
+   EVENT DETAILS STANDALONE PAGE (event-details.html)
+   Requires: <body class="event-page">
+   ========================================================= */
+body.event-page {
+    background: #ffffff;
+    color: #111827;
+}
+
+/* Red header variant only on event page */
+body.event-page .header {
+    background: #dc2626;
+    color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+body.event-page .header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+body.event-page .logo {
+    color: #ffffff;
+}
+
+body.event-page .back-link {
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+body.event-page .back-link:hover {
+    background: #ffffff;
+    color: #dc2626;
+}
+
+/* Container */
+body.event-page #eventContainer {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+/* Hero image */
+body.event-page .event-hero {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+/* Header section */
+body.event-page .event-header {
+    margin-top: 1.5rem;
+}
+
+body.event-page .event-header .event-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #b91c1c;
+    margin-top: 0.5rem;
+}
+
+body.event-page .event-category {
+    background: #dc2626;
+    color: #ffffff;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+/* Two-column content */
+body.event-page .event-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+/* Details column */
+body.event-page .event-details {
+    background: #fff5f5;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #fca5a5;
+}
+
+body.event-page .detail-section h2 {
+    color: #b91c1c;
+    margin-bottom: 1rem;
+}
+
+body.event-page .info-item {
+    background: #ffffff;
+    padding: 0.8rem;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    margin-bottom: 0.8rem;
+}
+
+/* Sidebar */
+body.event-page .event-sidebar {
+    position: sticky;
+    top: 120px;
+}
+
+body.event-page .price-card {
+    background: #fff5f5;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #fca5a5;
+    text-align: center;
+}
+
+body.event-page .price {
+    color: #dc2626;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+body.event-page .price-card .btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+body.event-page .price-card .btn-primary {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+body.event-page .price-card .btn-primary:hover {
+    background: #b91c1c;
+}
+
+body.event-page .price-card .btn-secondary {
+    background: #ffffff;
+    color: #dc2626;
+    border: 1px solid #dc2626;
+}
+
+body.event-page .price-card .btn-secondary:hover {
+    background: #fff5f5;
+}
+
+/* Organizer card */
+body.event-page .organizer-card {
+    background: #ffffff;
+    border: 1px solid #fca5a5;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+body.event-page .organizer-title {
+    color: #4b5563;
+    font-size: 0.9rem;
+}
+
+body.event-page .organizer-name {
+    font-weight: 600;
+    color: #b91c1c;
+}
+
+/* Responsive for event page */
+@media (max-width: 768px) {
+    body.event-page .header-content {
+        padding: 0 1.5rem;
+    }
+
+    body.event-page #eventContainer {
+        padding: 0 1.5rem;
+    }
+
+    body.event-page .event-content {
+        grid-template-columns: 1fr;
+    }
+
+    body.event-page .event-sidebar {
+        position: static;
+        margin-top: 1.5rem;
+    }
+}
+
+/* =========================================================
+   SIGNUP STANDALONE PAGE (signup.html)
+   Requires: <body class="signup-page">
+   ========================================================= */
+body.signup-page {
+    background: #f5f6fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+}
+
+body.signup-page .logo-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+body.signup-page .logo {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ff6b35;
+    text-decoration: none;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+body.signup-page .back-link {
+    display: inline-block;
+    color: #555;
+    text-decoration: none;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+body.signup-page .back-link:hover {
+    opacity: 1;
+}
+
+body.signup-page .registration-container {
+    max-width: 600px;
+    width: 100%;
+}
+
+/* Gradient card for signup */
+body.signup-page .form-container {
+    background: linear-gradient(135deg, #ff6b35 0%, #f73378 100%);
+    padding: 2.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    color: white;
+}
+
+body.signup-page .form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+body.signup-page .form-header h2 {
+    font-size: 2rem;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+body.signup-page .form-header p {
+    color: #ffeef3;
+}
+
+body.signup-page .form-group {
+    margin-bottom: 1.5rem;
+}
+
+body.signup-page .form-label {
+    display: block;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+body.signup-page .form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+body.signup-page .form-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+}
+
+body.signup-page .radio-group {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+body.signup-page .radio-option {
+    flex: 1;
+    position: relative;
+}
+
+body.signup-page .radio-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+body.signup-page .radio-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    border: 2px solid rgba(255,255,255,0.5);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+    color: white;
+    background: rgba(255,255,255,0.1);
+}
+
+body.signup-page .radio-option input[type="radio"]:checked + .radio-label {
+    background: rgba(255,255,255,0.3);
+    border-color: white;
+}
+
+body.signup-page .radio-label:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+body.signup-page .submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: white;
+    color: #ff6b35;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 1rem;
+}
+
+body.signup-page .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255,255,255,0.4);
+}
+
+body.signup-page .success-message {
+    display: none;
+    background: #10b981;
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+body.signup-page .error-message {
+    display: none;
+    background: #dc2626;
+    color: white;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    body.signup-page .form-container {
+        padding: 1.5rem;
+    }
+
+    body.signup-page .radio-group {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    body.signup-page {
+        padding: 1rem;
+    }
+}
+
+/* =========================================================
+   ADMIN STANDALONE PAGE (admin.html)
+   Requires: <body class="admin-page">
+   ========================================================= */
+body.admin-page {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(135deg, #991b1b, #ef4444);
+    color: #1f2937;
+    min-height: 100vh;
+}
+
+/* Main admin container */
+body.admin-page .admin-section {
+    max-width: 1400px;
+    margin: 2rem auto;
+    background: #fff;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(220, 38, 38, 0.15);
+}
+
+/* Inner header inside admin-section */
+body.admin-page .admin-section .admin-header {
+    background: linear-gradient(135deg, #991b1b, #ef4444);
+    padding: 2.5rem 2rem;
+    color: #fff;
+    text-align: left;
+}
+
+body.admin-page .admin-section .admin-header h1 {
+    font-size: 2.4rem;
+}
+
+body.admin-page .admin-section .admin-header p {
+    margin-top: 0.5rem;
+    color: #ffe4e6;
+}
+
+/* Top hero header for admin page (if used) */
+body.admin-page .admin-header {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+    color: white;
+    background: linear-gradient(135deg, #dc2626, #991b1b);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+body.admin-page .admin-header h1 { font-size: 2.5rem; font-weight: 700; }
+body.admin-page .admin-header p { font-size: 1.1rem; color: #fcdcdc; margin-top: 0.5rem; }
+
+/* Layout inside admin-section */
+body.admin-page .admin-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+body.admin-page .pending-events,
+body.admin-page .calendar-container {
+    background: #fff9f9;
+    border: 1px solid #fca5a5;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+body.admin-page .pending-events h2,
+body.admin-page .calendar-container h2 {
+    color: #991b1b;
+    margin-bottom: 1rem;
+}
+
+/* Pending cards */
+body.admin-page .pending-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem 1rem;
+    padding: 1rem;
+    border: 1px solid #fca5a5;
+    border-radius: 0.85rem;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    margin-bottom: 0.75rem;
+}
+
+body.admin-page .pending-card strong {
+    font-size: 1.1rem;
+}
+
+body.admin-page .pending-card p {
+    grid-column: 1 / -1;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Calendar */
+body.admin-page .calendar-nav {
+    display: flex;
+    gap: 0.5rem;
+}
+
+body.admin-page .calendar-nav button {
+    background: #991b1b;
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.45rem 0.8rem;
+    cursor: pointer;
+}
+
+body.admin-page .calendar-month {
+    font-weight: 700;
+    color: #991b1b;
+}
+
+body.admin-page .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+body.admin-page .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+}
+
+body.admin-page .calendar-cell {
+    border: 1px solid #fca5a5;
+    border-radius: 0.75rem;
+    padding: 0.6rem;
+    background: #fff;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+body.admin-page .calendar-cell .day-number {
+    font-weight: 700;
+    color: #991b1b;
+}
+
+body.admin-page .calendar-event {
+    background: #fef2f2;
+    border-left: 4px solid #991b1b;
+    border-radius: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.9rem;
+}
+
+body.admin-page .calendar-event.pending { border-color: #f59e0b; background: #fffbeb; }
+body.admin-page .calendar-event.approved { border-color: #22c55e; background: #ecfdf3; }
+body.admin-page .calendar-event.rejected { border-color: #ef4444; background: #fef2f2; }
+
+body.admin-page .calendar-weekday {
+    text-align: center;
+    font-weight: 700;
+    color: #991b1b;
+}
+
+/* Stats section above admin-section (optional) */
+body.admin-page .stats-section {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+body.admin-page .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+body.admin-page .stat-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.75rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+body.admin-page .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(220, 38, 38, 0.25);
+}
+
+body.admin-page .stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+}
+
+body.admin-page .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #991b1b;
+}
+
+body.admin-page .stat-label {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+/* Main card wrapper inside admin page */
+body.admin-page .main {
+    max-width: 1200px;
+    margin: 0 auto 3rem;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    padding: 1.5rem;
+    border: 1px solid #fca5a5;
+}
+
+/* Re-using generic .dashboard-grid etc but scoped for admin-specific colors */
+body.admin-page .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+/* Badges & buttons inside admin tables */
+body.admin-page .events-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+body.admin-page .events-table th,
+body.admin-page .events-table td {
+    padding: 0.85rem;
+    text-align: left;
+}
+
+body.admin-page .events-table thead {
+    background: #fef2f2;
+}
+
+body.admin-page .events-table tbody tr:nth-child(even) { background: #fff; }
+body.admin-page .events-table tbody tr:nth-child(odd) { background: #fff7f7; }
+
+body.admin-page .badge {
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+body.admin-page .badge.pending { background: #fff7ed; color: #c2410c; }
+body.admin-page .badge.approved { background: #ecfdf3; color: #15803d; }
+body.admin-page .badge.rejected { background: #fef2f2; color: #dc2626; }
+
+body.admin-page .status-badge {
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+body.admin-page .status-badge.status-approved { background: #ecfdf3; color: #166534; }
+body.admin-page .status-badge.status-pending { background: #fff7ed; color: #c2410c; }
+body.admin-page .status-badge.status-rejected { background: #fef2f2; color: #dc2626; }
+
+body.admin-page .btn.approve { background: #22c55e; color: white; }
+body.admin-page .btn.reject { background: #ef4444; color: white; }
+body.admin-page .btn.block { background: #6b7280; color: white; }
+
+body.admin-page .btn.approve,
+body.admin-page .btn.reject,
+body.admin-page .btn.block {
+    border-radius: 0.5rem;
+    padding: 0.45rem 0.9rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+body.admin-page .btn:hover {
+    opacity: 0.9;
+}
+
+body.admin-page .empty {
+    text-align: center;
+    color: #6b7280;
+    padding: 2rem;
+}
+
+/* Admin responsive tweaks */
+@media (max-width: 768px) {
+    body.admin-page .main { padding: 1rem; }
+    body.admin-page .events-table { display: block; overflow-x: auto; }
+    body.admin-page .admin-section { margin: 1rem; }
+    body.admin-page .admin-content { grid-template-columns: 1fr; padding: 1.25rem; }
+    body.admin-page .calendar-grid { grid-template-columns: repeat(7, minmax(32px, 1fr)); }
+    body.admin-page .calendar-cell { min-height: 80px; }
+}
+
+/* =========================================================
+   MY EVENTS PANEL (my-events.html)
+   ========================================================= */
+
+/* We do NOT redefine * or body here to avoid conflicts */
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Back link, aligned with index primary color */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #ff6b35;
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background: rgba(255, 107, 53, 0.08);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.back-link:hover {
+    background: rgba(255, 107, 53, 0.16);
+}
+
+/* Header / cards – scoped to header inside .container to avoid clashing with main site header */
+.container > .header {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.container > .header h1 {
+    color: #111827;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.container > .header p {
+    color: #6b7280;
+    font-size: 1rem;
+}
+
+/* Stats */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(15, 23, 42, 0.06);
+    text-align: center;
+}
+
+.stat-card h3 {
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+.stat-card p {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.stat-card.total h3 {
+    color: #ff6b35;
+}
+
+.stat-card.approved h3 {
+    color: #16a34a;
+}
+
+.stat-card.pending h3 {
+    color: #f59e0b;
+}
+
+/* Events list */
+.events-list {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.events-list h2 {
+    color: #111827;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.event-item {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    border: 2px solid #f3f4f6;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    background: #ffffff;
+}
+
+.event-item:hover {
+    border-color: #ff6b35;
+    box-shadow: 0 8px 24px rgba(255, 107, 53, 0.18);
+}
+
+.event-item .event-image {
+    width: 200px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 10px;
+    flex-shrink: 0;
+    background: #e5e7eb;
+}
+
+.event-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.event-title {
+    font-size: 1.2rem;
+    color: #111827;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.event-details {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.event-details span {
+    margin-right: 15px;
+    display: inline-block;
+}
+
+.event-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Status badges – will override the earlier generic size but that’s fine visually */
+.status-badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-badge.approved {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* Buttons */
+.event-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-view {
+    background: #ff6b35;
+    color: #ffffff;
+}
+
+.btn-view:hover {
+    background: #e85a2a;
+    transform: translateY(-1px);
+}
+
+.btn-edit {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.btn-edit:hover {
+    background: #e5e7eb;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #111827;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .event-item {
+        flex-direction: column;
+    }
+
+    .event-item .event-image {
+        width: 100%;
+        height: 200px;
+    }
+
+    .event-footer {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================================
+   EVENTS LIST + MAP PAGE (events.html)
+   Requires: <body class="events-page">
+   ========================================================= */
+
+:root {
+    --primary: #ff6b35;
+    --primary-hover: #e85a2a;
+    --background: #ffffff;
+    --foreground: #333333;
+    --muted: #f8f9fa;
+    --muted-foreground: #6b7280;
+    --border: #e5e7eb;
+    --card: #ffffff;
+    --accent: #f3f4f6;
+    --success: #10b981;
+    --warning: #f59e0b;
+}
+
+/* Header (reuses global header look, just layout tweaks) */
+.header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+/* Search in header */
+.search-container {
+    display: flex;
+    flex: 1;
+    max-width: 600px;
+    gap: 0.5rem;
+}
+
+.search-input {
+    flex: 1;
+    padding: 0.625rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #ffffff;
+}
+
+.search-input:focus {
+    border-color: var(--primary);
+}
+
+.search-btn {
+    padding: 0.625rem 1rem;
+    background: var(--primary);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-btn:hover {
+    background: var(--primary-hover);
+}
+
+/* Header nav */
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header-nav a {
+    color: var(--foreground);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.header-nav a:hover {
+    color: var(--primary);
+}
+
+/* Use global .btn-outline / .btn-primary; no redefinition here */
+
+/* Breadcrumbs & page header – scoped to events page */
+.events-page .breadcrumbs {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.events-page .breadcrumbs a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.events-page .breadcrumbs a:hover {
+    text-decoration: underline;
+}
+
+.events-page .breadcrumbs span {
+    color: var(--muted-foreground);
+}
+
+.events-page .page-header {
+    max-width: 1400px;
+    margin: 0 auto 2rem;
+    padding: 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.events-page .page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--foreground);
+}
+
+.events-page .page-header p {
+    font-size: 1rem;
+    color: var(--muted-foreground);
+}
+
+/* Main layout */
+.events-page .main-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem 2rem;
+    display: grid;
+    grid-template-columns: 240px 1fr 400px;
+    gap: 1.5rem;
+}
+
+/* Filters sidebar */
+.events-page .filters-sidebar {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 1.25rem;
+    height: fit-content;
+    position: sticky;
+    top: 80px;
+    border: 1px solid var(--border);
+}
+
+.filters-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.active-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.active-filters-label {
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+}
+
+.filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    background: var(--accent);
+    border-radius: 20px;
+    font-size: 0.8125rem;
+}
+
+.filter-tag button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted-foreground);
+    display: flex;
+    align-items: center;
+}
+
+.clear-all {
+    color: var(--primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.clear-all:hover {
+    text-decoration: underline;
+}
+
+.filter-section {
+    margin-bottom: 1.5rem;
+}
+
+.filter-section h3 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--foreground);
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--foreground);
+    transition: color 0.2s;
+}
+
+.filter-option:hover {
+    color: var(--primary);
+}
+
+.filter-option input[type="checkbox"],
+.filter-option input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.filter-option svg {
+    width: 18px;
+    height: 18px;
+    color: var(--muted-foreground);
+}
+
+.view-more {
+    color: var(--primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0.5rem 0;
+}
+
+.view-more:hover {
+    text-decoration: underline;
+}
+
+/* Events list */
+.events-page .events-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.events-page .events-count {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    margin-bottom: 0.5rem;
+}
+
+/* Event cards – scoped under events-content so it doesn’t affect home cards */
+.events-content .event-card {
+    background: var(--card);
+    border-radius: 12px;
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    cursor: pointer;
+    transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+    border: 1px solid var(--border);
+}
+
+.events-content .event-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    border-color: var(--primary);
+}
+
+.events-content .event-image {
+    width: 180px;
+    height: 120px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* Event details (text) */
+.events-content .event-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.events-content .event-date {
+    font-size: 0.8125rem;
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.events-content .event-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.375rem;
+    color: var(--foreground);
+    line-height: 1.4;
+}
+
+.events-content .event-location {
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    margin-bottom: 0.5rem;
+}
+
+/* Meta line: price & category */
+.events-content .event-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: auto;
+}
+
+/* IMPORTANT: override index overlay styles only in this context */
+.events-content .event-price {
+    position: static;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--success);
+}
+
+.events-content .event-category {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--accent);
+    border-radius: 4px;
+    color: var(--muted-foreground);
+}
+
+/* Heart actions */
+.events-content .event-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.events-content .like-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: var(--muted-foreground);
+    transition: color 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.events-content .like-btn:hover {
+    transform: scale(1.05);
+    color: #ef4444;
+}
+
+.events-content .like-btn.active {
+    color: #ef4444;
+}
+
+.events-content .like-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Map section */
+.events-page .map-section {
+    position: sticky;
+    top: 80px;
+    height: calc(100vh - 100px);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.map-container {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #e8f4ea 0%, #f0e8f4 50%, #f4e8e8 100%);
+    position: relative;
+}
+
+.map-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.map-placeholder svg {
+    width: 64px;
+    height: 64px;
+    color: var(--primary);
+    opacity: 0.5;
+}
+
+.map-placeholder p {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+}
+
+.map-toggle {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.625rem 1rem;
+    background: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.map-toggle:hover {
+    background: var(--accent);
+}
+
+/* Map markers */
+.map-marker {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.map-marker:hover {
+    transform: rotate(-45deg) scale(1.2);
+}
+
+.map-marker span {
+    transform: rotate(45deg);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Mobile filter toggle */
+.mobile-filter-toggle {
+    display: none;
+    width: 100%;
+    padding: 0.75rem;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .events-page .main-container {
+        grid-template-columns: 220px 1fr;
+    }
+
+    .events-page .map-section {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        flex-wrap: wrap;
+    }
+
+    .search-container {
+        order: 3;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .header-nav {
+        display: none;
+    }
+
+    .events-page .main-container {
+        grid-template-columns: 1fr;
+    }
+
+    .events-page .filters-sidebar {
+        position: static;
+    }
+
+    .events-content .event-card {
+        flex-direction: column;
+    }
+
+    .events-content .event-image {
+        width: 100%;
+        height: 160px;
+    }
+
+    .events-page .page-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .mobile-filter-toggle {
+        display: flex;
+    }
+
+    .events-page .filters-sidebar {
+        display: none;
+    }
+
+    .events-page .filters-sidebar.active {
+        display: block;
+        margin-bottom: 1rem;
     }
 }

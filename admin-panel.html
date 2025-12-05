@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administratoriaus skydelis - CityEvents</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    <link rel="stylesheet" href="assets/css/admin-panel.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="index.html" class="logo">CityEvents</a>
+                <nav class="nav">
+                    <a href="index.html#events" class="nav-link" title="Renginiai – pagrindinė renginių peržiūra">Renginiai</a>
+                    <a href="city-map.html" class="nav-link" title="Žemėlapis – vizualus renginių žemėlapis">Žemėlapis</a>
+                    <a href="for-organizers.html" class="nav-link" title="Organizatoriams – informacija renginių organizatoriams">Organizatoriams</a>
+                    <a href="help-center.html" class="nav-link" title="Pagalba – DUK ir pagalbos centras">Pagalba</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="header-actions" id="authActions"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <h1 class="page-title">Administratoriaus skydelis</h1>
+        <p class="page-subtitle">Valdykite renginius, naudotojus ir stebėkite platformos statistiką</p>
+
+        <!-- Statistics -->
+        <div class="stats-grid" id="statsGrid">
+            <!-- Stats will be rendered by JS -->
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Pending Events Section -->
+            <div class="section-card">
+                <div class="tabs">
+                    <button class="tab active" data-tab="pending">
+                        Laukiantys patvirtinimo
+                        <span class="tab-badge" id="pendingCount">0</span>
+                    </button>
+                    <button class="tab" data-tab="approved">Patvirtinti</button>
+                    <button class="tab" data-tab="rejected">Atmesti</button>
+                </div>
+                <div class="section-body" id="eventsContainer">
+                    <!-- Events will be rendered by JS -->
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="sidebar-sections">
+                <!-- Calendar -->
+                <div class="section-card" style="margin-bottom: 2rem;">
+                    <div class="section-header">
+                        <h2>📅 Renginių kalendorius</h2>
+                    </div>
+                    <div class="section-body">
+                        <div class="calendar-header">
+                            <span class="calendar-month" id="calendarMonth"></span>
+                            <div class="calendar-nav">
+                                <button onclick="changeMonth(-1)">◀</button>
+                                <button onclick="changeMonth(1)">▶</button>
+                            </div>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid">
+                            <!-- Calendar will be rendered by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2>🕐 Naujausia veikla</h2>
+                    </div>
+                    <div class="section-body" id="activityContainer">
+                        <!-- Activity will be rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span id="toastIcon"></span>
+        <span id="toastMessage"></span>
+    </div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        // Mock Data
+        const events = [
+            {
+                id: 1,
+                title: "Kalėdinis mugė Katedros aikštėje",
+                category: "Festivalis",
+                image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400",
+                date: "2024-12-20",
+                displayDate: "Gruodžio 20, 10:00",
+                location: "Vilnius, Katedros aikštė",
+                organizer: "Vilniaus savivaldybė",
+                status: "pending",
+                submittedAt: "Prieš 2 val."
+            },
+            {
+                id: 2,
+                title: "Naujametinis koncertas",
+                category: "Muzika",
+                image: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400",
+                date: "2024-12-31",
+                displayDate: "Gruodžio 31, 22:00",
+                location: "Vilnius, Vingio parkas",
+                organizer: "LRT",
+                status: "pending",
+                submittedAt: "Prieš 5 val."
+            },
+            {
+                id: 3,
+                title: "IT konferencija 2025",
+                category: "Konferencija",
+                image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400",
+                date: "2025-01-15",
+                displayDate: "Sausio 15, 09:00",
+                location: "Vilnius, Litexpo",
+                organizer: "TechHub Lithuania",
+                status: "pending",
+                submittedAt: "Prieš 1 d."
+            },
+            {
+                id: 4,
+                title: "Vasaros muzikos festivalis",
+                category: "Muzika",
+                image: "https://images.unsplash.com/photo-1506157786151-b8491531f063?w=400",
+                date: "2024-12-10",
+                displayDate: "Gruodžio 10, 18:00",
+                location: "Kaunas, Santaka",
+                organizer: "Kauno m. savivaldybė",
+                status: "approved",
+                submittedAt: "Prieš 3 d."
+            },
+            {
+                id: 5,
+                title: "Meno paroda",
+                category: "Paroda",
+                image: "https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=400",
+                date: "2024-12-08",
+                displayDate: "Gruodžio 8, 12:00",
+                location: "Vilnius, MO muziejus",
+                organizer: "MO muziejus",
+                status: "approved",
+                submittedAt: "Prieš 5 d."
+            },
+            {
+                id: 6,
+                title: "Netinkamas renginys",
+                category: "Kita",
+                image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400",
+                date: "2024-12-05",
+                displayDate: "Gruodžio 5, 20:00",
+                location: "Nenurodyta",
+                organizer: "Anon",
+                status: "rejected",
+                submittedAt: "Prieš 1 sav."
+            }
+        ];
+
+        const activities = [
+            { type: "approve", text: '<strong>Vasaros muzikos festivalis</strong> patvirtintas', time: "Prieš 2 val." },
+            { type: "new", text: 'Naujas renginys <strong>Kalėdinis mugė</strong> pateiktas', time: "Prieš 3 val." },
+            { type: "user", text: 'Naujas organizatorius <strong>TechHub</strong> užsiregistravo', time: "Prieš 5 val." },
+            { type: "reject", text: '<strong>Netinkamas renginys</strong> atmestas', time: "Prieš 1 d." },
+            { type: "approve", text: '<strong>Meno paroda</strong> patvirtinta', time: "Prieš 2 d." }
+        ];
+
+        let currentTab = 'pending';
+        let currentDate = new Date();
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStats();
+            renderEvents();
+            renderCalendar();
+            renderActivity();
+            setupTabs();
+        });
+
+        // Render Statistics
+        function renderStats() {
+            const stats = [
+                { icon: '📊', label: 'Viso renginių', value: events.length, type: 'total' },
+                { icon: '⏳', label: 'Laukia patvirtinimo', value: events.filter(e => e.status === 'pending').length, type: 'pending' },
+                { icon: '✅', label: 'Patvirtinti', value: events.filter(e => e.status === 'approved').length, type: 'approved' },
+                { icon: '❌', label: 'Atmesti', value: events.filter(e => e.status === 'rejected').length, type: 'rejected' },
+                { icon: '👥', label: 'Naudotojai', value: 1247, type: 'users' }
+            ];
+
+            document.getElementById('statsGrid').innerHTML = stats.map(stat => `
+                <div class="stat-card">
+                    <div class="stat-icon ${stat.type}">${stat.icon}</div>
+                    <div class="stat-content">
+                        <h3>${stat.value}</h3>
+                        <p>${stat.label}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Events
+        function renderEvents() {
+            const filteredEvents = events.filter(e => e.status === currentTab);
+            const container = document.getElementById('eventsContainer');
+
+            if (filteredEvents.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>Nėra renginių šioje kategorijoje</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredEvents.map(event => `
+                <div class="pending-event" id="event-${event.id}">
+                    <img src="${event.image}" alt="${event.title}" class="pending-event-image">
+                    <div class="pending-event-content">
+                        <div class="pending-event-title">${event.title}</div>
+                        <div class="pending-event-meta">
+                            📅 ${event.displayDate} • 📍 ${event.location}
+                        </div>
+                        <div class="pending-event-organizer">
+                            👤 Organizatorius: ${event.organizer} • ${event.submittedAt}
+                        </div>
+                    </div>
+                    <div class="pending-event-actions">
+                        ${currentTab === 'pending' ? `
+                            <button class="btn btn-approve" onclick="approveEvent(${event.id})">✓ Patvirtinti</button>
+                            <button class="btn btn-reject" onclick="rejectEvent(${event.id})">✕ Atmesti</button>
+                        ` : ''}
+                        <button class="btn btn-view" onclick="viewEvent(${event.id})">👁 Peržiūrėti</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Update pending count badge
+            document.getElementById('pendingCount').textContent = events.filter(e => e.status === 'pending').length;
+        }
+
+        // Setup Tabs
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentTab = tab.dataset.tab;
+                    renderEvents();
+                });
+            });
+        }
+
+        // Approve Event
+        function approveEvent(id) {
+            const event = events.find(e => e.id === id);
+            if (event) {
+                event.status = 'approved';
+                renderStats();
+                renderEvents();
+                showToast(`"${event.title}" sėkmingai patvirtintas!`, 'success');
+            }
+        }
+
+        // Reject Event
+        function rejectEvent(id) {
+            const event = events.find(e => e.id === id);
+            if (event) {
+                event.status = 'rejected';
+                renderStats();
+                renderEvents();
+                showToast(`"${event.title}" atmestas`, 'error');
+            }
+        }
+
+        // View Event
+        function viewEvent(id) {
+            const event = events.find(e => e.id === id);
+            if (event) {
+                showToast(`Atidaroma: ${event.title}`, '');
+            }
+        }
+
+        // Calendar
+        const monthNames = ['Sausis', 'Vasaris', 'Kovas', 'Balandis', 'Gegužė', 'Birželis',
+            'Liepa', 'Rugpjūtis', 'Rugsėjis', 'Spalis', 'Lapkritis', 'Gruodis'];
+        const dayNames = ['Pr', 'An', 'Tr', 'Kt', 'Pn', 'Št', 'Sk'];
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            document.getElementById('calendarMonth').textContent = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDay = (firstDay.getDay() + 6) % 7;
+
+            const eventDates = events.map(e => e.date);
+            const pendingDates = events.filter(e => e.status === 'pending').map(e => e.date);
+
+            let html = dayNames.map(d => `<div class="calendar-day-header">${d}</div>`).join('');
+
+            // Previous month days
+            const prevMonthDays = new Date(year, month, 0).getDate();
+            for (let i = startDay - 1; i >= 0; i--) {
+                html += `<div class="calendar-day other-month">${prevMonthDays - i}</div>`;
+            }
+
+            // Current month days
+            const today = new Date();
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isToday = today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
+                const hasEvent = eventDates.includes(dateStr);
+                const hasPending = pendingDates.includes(dateStr);
+
+                let classes = 'calendar-day';
+                if (isToday) classes += ' today';
+                if (hasPending) classes += ' has-pending';
+                else if (hasEvent) classes += ' has-event';
+
+                html += `<div class="${classes}">${day}</div>`;
+            }
+
+            // Next month days
+            const remaining = 42 - (startDay + lastDay.getDate());
+            for (let i = 1; i <= remaining; i++) {
+                html += `<div class="calendar-day other-month">${i}</div>`;
+            }
+
+            document.getElementById('calendarGrid').innerHTML = html;
+        }
+
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        // Activity
+        function renderActivity() {
+            document.getElementById('activityContainer').innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon ${activity.type}">
+                        ${activity.type === 'approve' ? '✓' :
+                            activity.type === 'reject' ? '✕' :
+                                activity.type === 'new' ? '📝' : '👤'}
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-text">${activity.text}</div>
+                        <div class="activity-time">${activity.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Toast
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+
+            toast.className = 'toast show' + (type ? ` ${type}` : '');
+            toastIcon.textContent = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+            toastMessage.textContent = message;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

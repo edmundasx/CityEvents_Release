@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mano Renginiai - Organizatoriaus Panelė</title>
+
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/organizer-events.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="index.html" class="logo">🎉 CityEvents</a>
+                <nav class="nav">
+                    <a href="index.html" class="nav-link">Naršyti renginius</a>
+                    <a href="create-event.html" class="nav-link">Sukurti renginį</a>
+                    <a href="organizer-events.html" class="nav-link active">Mano renginiai</a>
+                    <a href="organizer-dashboard.html" class="nav-link">Skydelis</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="user-menu">
+                    <!-- User menu content if needed, or just profile -->
+                    <!-- For consistency with dashboard -->
+                     <div style="width: 32px; height: 32px; background: #667eea; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">JD</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Back link removed as we have navbar -->
+
+        <div class="page-header-box">
+            <h1>Mano Renginiai</h1>
+            <p>Peržiūrėkite ir valdykite savo pateiktus renginius</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card total">
+                <h3 id="totalCount">0</h3>
+                <p>Viso Renginių</p>
+            </div>
+            <div class="stat-card approved">
+                <h3 id="approvedCount">0</h3>
+                <p>Patvirtinti</p>
+            </div>
+            <div class="stat-card pending">
+                <h3 id="pendingCount">0</h3>
+                <p>Laukia Patvirtinimo</p>
+            </div>
+        </div>
+
+        <div class="events-list">
+            <h2>Pateikti Renginiai</h2>
+            <div id="eventsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // Mockup data - organizatoriaus pateikti renginiai
+        const organizerEvents = [
+            {
+                id: "1",
+                title: "Vasaros Muzikos Festivalis 2025",
+                date: "2025-06-15",
+                time: "14:00",
+                location: "Centro Parkas, Vilnius",
+                image: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&q=80",
+                price: "45€",
+                status: "approved",
+                submittedDate: "2025-05-01"
+            },
+            {
+                id: "2",
+                title: "Technologijų Konferencija: AI ir Ateitis",
+                date: "2025-07-08",
+                time: "09:00",
+                location: "Konferencijų Centras, Kaunas",
+                image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80",
+                price: "299€",
+                status: "approved",
+                submittedDate: "2025-05-05"
+            },
+            {
+                id: "7",
+                title: "Fotografijos Paroda: Lietuvos Gamta",
+                date: "2025-08-12",
+                time: "18:00",
+                location: "Nacionalinė Galerija, Vilnius",
+                image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80",
+                price: "Nemokama",
+                status: "pending",
+                submittedDate: "2025-05-18"
+            },
+            {
+                id: "8",
+                title: "Verslo Startuolių Mugė",
+                date: "2025-08-20",
+                time: "10:00",
+                location: "LitExpo, Vilnius",
+                image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&q=80",
+                price: "50€",
+                status: "pending",
+                submittedDate: "2025-05-20"
+            },
+            {
+                id: "9",
+                title: "Jaunimo Teatro Festivalis",
+                date: "2025-09-05",
+                time: "19:00",
+                location: "Nacionalinis Dramos Teatras, Vilnius",
+                image: "https://images.unsplash.com/photo-1507924538820-ede94a04019d?w=800&q=80",
+                price: "25€",
+                status: "approved",
+                submittedDate: "2025-05-10"
+            }
+        ];
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('lt-LT', options);
+        }
+
+        function getStatusText(status) {
+            return status === 'approved' ? 'Patvirtintas' : 'Laukia patvirtinimo';
+        }
+
+        function renderEvents() {
+            const container = document.getElementById('eventsContainer');
+            
+            if (organizerEvents.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Dar neturite pateiktų renginių</h3>
+                        <p>Pradėkite kurti savo pirmąjį renginį!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Calculate stats
+            const total = organizerEvents.length;
+            const approved = organizerEvents.filter(e => e.status === 'approved').length;
+            const pending = organizerEvents.filter(e => e.status === 'pending').length;
+
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('approvedCount').textContent = approved;
+            document.getElementById('pendingCount').textContent = pending;
+
+            // Render events
+            container.innerHTML = organizerEvents.map(event => `
+                <div class="event-item">
+                    <img src="${event.image}" alt="${event.title}" class="event-image">
+                    <div class="event-content">
+                        <div>
+                            <h3 class="event-title">${event.title}</h3>
+                            <div class="event-details">
+                                <span>📅 ${formatDate(event.date)}</span>
+                                <span>🕐 ${event.time}</span>
+                                <span>📍 ${event.location}</span>
+                            </div>
+                            <div class="event-details">
+                                <span>💰 ${event.price}</span>
+                                <span>Pateikta: ${formatDate(event.submittedDate)}</span>
+                            </div>
+                        </div>
+                        <div class="event-footer">
+                            <span class="status-badge ${event.status}">
+                                ${getStatusText(event.status)}
+                            </span>
+                            <div class="event-actions">
+                                <a href="event-details.html?id=${event.id}" class="btn btn-view">Peržiūrėti</a>
+                                <button class="btn btn-edit" onclick="alert('Redagavimo funkcija bus pridėta')">Redaguoti</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize
+        renderEvents();
+    </script>
+</body>
+</html>

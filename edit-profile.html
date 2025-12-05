@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redaguoti Profilį - CityEvents</title>
+    
+
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    <link rel="stylesheet" href="assets/css/edit-profile.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="index.html" class="logo">CityEvents</a>
+                <nav class="nav">
+                    <a href="index.html#events" class="nav-link" title="Renginiai – pagrindinė renginių peržiūra">Renginiai</a>
+                    <a href="city-map.html" class="nav-link" title="Žemėlapis – vizualus renginių žemėlapis">Žemėlapis</a>
+                    <a href="for-organizers.html" class="nav-link" title="Organizatoriams – informacija renginių organizatoriams">Organizatoriams</a>
+                    <a href="help-center.html" class="nav-link" title="Pagalba – DUK ir pagalbos centras">Pagalba</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="header-actions" id="authActions"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Redaguoti Profilį</h1>
+            <p>Atnaujinkite savo asmeninę informaciją</p>
+        </div>
+
+        <div class="profile-card">
+            <div class="avatar-section">
+                <div class="avatar" id="avatarDisplay">JV</div>
+                <div class="avatar-info">
+                    <h2 id="displayName">Jonas Valančiūnas</h2>
+                    <span class="user-type" id="userType">👤 Lankytojas</span>
+                </div>
+            </div>
+
+            <form id="profileForm">
+                <div class="form-group">
+                    <label>
+                        👤 Vardas ir Pavardė
+                    </label>
+                    <input type="text" id="fullName" name="fullName" required placeholder="Jonas Valančiūnas">
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        📧 El. paštas
+                    </label>
+                    <input type="email" id="email" name="email" required placeholder="jonas@example.com">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            📱 Telefonas
+                        </label>
+                        <input type="tel" id="phone" name="phone" placeholder="+370 600 00000">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            📍 Miestas
+                        </label>
+                        <input type="text" id="city" name="city" placeholder="Vilnius">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="window.history.back()">Atšaukti</button>
+                    <button type="submit" class="btn btn-primary">Išsaugoti pakeitimus</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="success-toast" id="successToast">
+        ✓ Profilis sėkmingai atnaujintas!
+    </div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        // Load user data
+        function loadUserData() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            
+            if (currentUser.name) {
+                document.getElementById('fullName').value = currentUser.name;
+                document.getElementById('displayName').textContent = currentUser.name;
+                
+                // Update avatar initials
+                const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                document.getElementById('avatarDisplay').textContent = initials;
+            }
+            
+            if (currentUser.email) {
+                document.getElementById('email').value = currentUser.email;
+            }
+            
+            if (currentUser.phone) {
+                document.getElementById('phone').value = currentUser.phone;
+            }
+            
+            if (currentUser.city) {
+                document.getElementById('city').value = currentUser.city;
+            }
+            
+            // Set user type display
+            const userTypeMap = {
+                'visitor': '👤 Lankytojas',
+                'organizer': '🎪 Organizatorius',
+                'admin': '👑 Administratorius'
+            };
+            
+            const userType = currentUser.type || 'visitor';
+            document.getElementById('userType').textContent = userTypeMap[userType];
+        }
+
+        // Save profile
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            
+            currentUser.name = document.getElementById('fullName').value;
+            currentUser.email = document.getElementById('email').value;
+            currentUser.phone = document.getElementById('phone').value;
+            currentUser.city = document.getElementById('city').value;
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Show success toast
+            const toast = document.getElementById('successToast');
+            toast.classList.add('show');
+            
+            // Update display
+            loadUserData();
+            
+            // Hide toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        });
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = '/';
+        }
+
+        // Initialize
+        loadUserData();
+    </script>
+</body>
+</html>

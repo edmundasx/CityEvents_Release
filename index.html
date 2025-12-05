@@ -6,20 +6,39 @@
     <title>City Events – Atrask renginius, kurie tau patinka</title>
     <meta name="description" content="Rask ir dalyvauk renginiuose, naršyk organizatorius arba sukurk savo renginį. Atrask muzikos, meno, verslo, maisto ir kitų sričių renginius.">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+z0ympK0tZbFdK4JeayQMZTcWd3vgXn8fLJXYM/to=" crossorigin="">
 </head>
 <body data-page="home">
     <header class="header">
         <div class="header-content">
-            <a href="index.html" class="logo">CityEvents</a>
-            <nav class="nav">
-                <a href="#events">Browse Events</a>
-                <a href="#mapCard">Map</a>
-                <a href="organizer-events.html">For Organizers</a>
-                <a href="#events">Help Center</a>
-                <a href="admin.html" data-nav-admin style="display: none;">Admin</a>
-            </nav>
-            <div class="header-actions" id="authActions"></div>
+            <div class="header-left">
+                <a href="index.html" class="logo">CityEvents</a>
+                <nav class="nav">
+                    <!-- Renginiai (Events): Core functionality – scrolls to events section on same page -->
+                    <a href="#events" class="nav-link" title="Renginiai – pagrindinė renginių peržiūra">
+                        Renginiai
+                    </a>
+
+                    <!-- Žemėlapis (Map): Visual exploration – opens city map page -->
+                    <a href="city-map.html" class="nav-link" title="Žemėlapis – vizualus renginių žemėlapis">
+                        Žemėlapis
+                    </a>
+
+                    <!-- Organizatoriams (For Organizers): Attract event hosts -->
+                    <a href="for-organizers.html" class="nav-link" title="Organizatoriams – informacija renginių organizatoriams">
+                        Organizatoriams
+                    </a>
+
+                    <!-- Pagalba (Help): FAQ access -->
+                    <a href="help-center.html" class="nav-link" title="Pagalba – DUK ir pagalbos centras">
+                        Pagalba
+                    </a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="header-actions" id="authActions"></div>
+            </div>
         </div>
     </header>
 

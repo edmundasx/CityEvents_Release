@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mano Renginiai - CityEvents</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    
+
+    <link rel="stylesheet" href="assets/css/my-events.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="index.html" class="logo">CityEvents</a>
+                <nav class="nav">
+                    <a href="index.html#events" class="nav-link" title="Renginiai – pagrindinė renginių peržiūra">Renginiai</a>
+                    <a href="city-map.html" class="nav-link" title="Žemėlapis – vizualus renginių žemėlapis">Žemėlapis</a>
+                    <a href="for-organizers.html" class="nav-link" title="Organizatoriams – informacija renginių organizatoriams">Organizatoriams</a>
+                    <a href="help-center.html" class="nav-link" title="Pagalba – DUK ir pagalbos centras">Pagalba</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="header-actions" id="authActions"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Mano Renginiai</h1>
+            <p>Valdykite savo pamėgtus ir aplankytus renginius</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('liked')">❤️ Pamėgti renginiai</button>
+            <button class="tab" onclick="switchTab('history')">📜 Renginių istorija</button>
+            <button class="tab" onclick="switchTab('calendar')">📅 Kalendorius</button>
+        </div>
+
+        <!-- Liked Events Tab -->
+        <div id="liked" class="tab-content active">
+            <div class="event-grid" id="likedEventsGrid"></div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="history" class="tab-content">
+            <div class="event-grid" id="historyEventsGrid"></div>
+        </div>
+
+        <!-- Calendar Tab -->
+        <div id="calendar" class="tab-content">
+            <div class="calendar-view">
+                <h3 style="margin-bottom: 1rem; color: hsl(var(--foreground));">Gruodis 2024</h3>
+                <div class="calendar-grid">
+                    <div class="calendar-header">Pr</div>
+                    <div class="calendar-header">An</div>
+                    <div class="calendar-header">Tr</div>
+                    <div class="calendar-header">Kt</div>
+                    <div class="calendar-header">Pn</div>
+                    <div class="calendar-header">Št</div>
+                    <div class="calendar-header">Sk</div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        // Mock data
+        const mockEvents = [
+            {
+                id: 1,
+                title: "Vasaros muzikos festivalis",
+                category: "Muzika",
+                image: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400",
+                date: "2024-12-15",
+                location: "Vilnius, Lukiškių aikštė",
+                price: "25",
+                status: "attended",
+                rating: 5
+            },
+            {
+                id: 2,
+                title: "Technologijų konferencija 2024",
+                category: "Technologijos",
+                image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400",
+                date: "2024-12-20",
+                location: "Kaunas, Forum Palace",
+                price: "0",
+                status: "upcoming"
+            },
+            {
+                id: 3,
+                title: "Kalėdinis mugė",
+                category: "Pramogos",
+                image: "https://images.unsplash.com/photo-1482223250324-e0c08a3e0f1f?w=400",
+                date: "2024-12-24",
+                location: "Vilnius, Rotušės aikštė",
+                price: "0",
+                status: "upcoming"
+            }
+        ];
+
+        function renderEventCard(event) {
+            const statusBadge = event.status === 'attended' 
+                ? '<span class="badge badge-success">Dalyvauta</span>'
+                : '<span class="badge badge-warning">Planuojama</span>';
+
+            const rating = event.rating 
+                ? `<div class="rating">${'★'.repeat(event.rating)}${'☆'.repeat(5 - event.rating)}</div>`
+                : '';
+
+            return `
+                <div class="event-card">
+                    <img src="${event.image}" alt="${event.title}" class="event-image">
+                    <div class="event-body">
+                        <span class="event-category">${event.category}</span>
+                        ${statusBadge}
+                        <h3 class="event-title">${event.title}</h3>
+                        <div class="event-info">
+                            <div class="event-info-item">📅 ${event.date}</div>
+                            <div class="event-info-item">📍 ${event.location}</div>
+                            <div class="event-info-item">💶 ${event.price === "0" ? "Nemokamas" : event.price + " €"}</div>
+                        </div>
+                        ${rating}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEmptyState(icon, title, message) {
+            return `
+                <div class="empty-state">
+                    <div class="empty-state-icon">${icon}</div>
+                    <h3>${title}</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        function loadLikedEvents() {
+            const grid = document.getElementById('likedEventsGrid');
+            const likedEvents = mockEvents.filter(e => e.status === 'upcoming');
+            
+            if (likedEvents.length === 0) {
+                grid.innerHTML = renderEmptyState('💔', 'Nėra pamėgtų renginių', 'Pradėkite pamėgti renginius, kad pamatytumėte juos čia');
+            } else {
+                grid.innerHTML = likedEvents.map(renderEventCard).join('');
+            }
+        }
+
+        function loadHistoryEvents() {
+            const grid = document.getElementById('historyEventsGrid');
+            const historyEvents = mockEvents.filter(e => e.status === 'attended');
+            
+            if (historyEvents.length === 0) {
+                grid.innerHTML = renderEmptyState('📜', 'Nėra aplankytų renginių', 'Jūsų aplankyti renginiai bus rodomi čia');
+            } else {
+                grid.innerHTML = historyEvents.map(renderEventCard).join('');
+            }
+        }
+
+        function loadCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const eventDates = mockEvents.map(e => new Date(e.date).getDate());
+            
+            let html = '';
+            for (let i = 1; i <= 31; i++) {
+                const hasEvent = eventDates.includes(i);
+                html += `<div class="calendar-day ${hasEvent ? 'has-event' : ''}">${i}</div>`;
+            }
+            
+            grid.innerHTML = html;
+        }
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = '/';
+        }
+
+        // Initialize
+        loadLikedEvents();
+        loadHistoryEvents();
+        loadCalendar();
+    </script>
+</body>
+</html>

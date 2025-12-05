@@ -1,0 +1,134 @@
+/* Navbar Styles - Unified & Improved */
+:root {
+    /* Default Theme (Light/Orange - matches index.html) */
+    --nav-bg: rgba(255, 255, 255, 0.9);
+    --nav-border: #e5e7eb;
+    --nav-text: #333;
+    --nav-text-hover: #ff6b35;
+    --logo-color: #ff6b35;
+    --logo-text-color: #ff6b35; /* Added separate color for text part */
+    --nav-height: 70px;
+}
+
+.header {
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--nav-border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    height: var(--nav-height);
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.header-content {
+    width: 100%;
+    max-width: 1200px; /* Consistent max-width */
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Layout Zones */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Logo */
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--logo-color);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform 0.2s;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+/* Navigation */
+.nav {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--nav-text);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.2s, border-bottom-color 0.2s;
+    position: relative;
+    padding: 0.25rem 0;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--nav-text-hover);
+    transition: width 0.3s;
+}
+
+.nav-link:hover {
+    color: var(--nav-text-hover);
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-link.active {
+    color: var(--nav-text-hover);
+    font-weight: 600;
+}
+
+.nav-link.active::after {
+    width: 100%;
+}
+
+/* Mobile Menu Toggle (Burger) - Basic Implementation */
+.mobile-menu-toggle {
+    display: none;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    color: var(--nav-text);
+    cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .nav {
+        display: none; /* Hidden on mobile for now, would need JS for toggle */
+    }
+    
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
+    .header-content {
+        justify-content: space-between;
+    }
+}

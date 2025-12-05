@@ -209,10 +209,11 @@ function getStoredUser() {
 }
 
 function ensureAuthContainer() {
-    const header = document.querySelector('.header .header-content');
-    if (!header) return null;
+    const headerContent = document.querySelector('.header .header-content');
+    if (!headerContent) return null;
 
-    header.querySelectorAll('button[onclick*="Login feature"], button[onclick*="Sign up feature"]').forEach(btn => {
+    // Cleanup legacy buttons if any
+    headerContent.querySelectorAll('button[onclick*="Login feature"], button[onclick*="Sign up feature"]').forEach(btn => {
         const parent = btn.closest('div');
         parent?.remove();
     });
@@ -222,7 +223,13 @@ function ensureAuthContainer() {
         container = document.createElement('div');
         container.id = 'authActions';
         container.className = 'header-actions';
-        header.appendChild(container);
+        
+        const headerRight = headerContent.querySelector('.header-right');
+        if (headerRight) {
+            headerRight.appendChild(container);
+        } else {
+            headerContent.appendChild(container);
+        }
     }
     return container;
 }

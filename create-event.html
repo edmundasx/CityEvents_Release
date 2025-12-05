@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sukurti Renginį - CityEvents</title>
+    
+
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    <link rel="stylesheet" href="assets/css/create-event.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="index.html" class="logo">CityEvents</a>
+                <nav class="nav">
+                    <a href="index.html#events" class="nav-link" title="Renginiai – pagrindinė renginių peržiūra">Renginiai</a>
+                    <a href="city-map.html" class="nav-link" title="Žemėlapis – vizualus renginių žemėlapis">Žemėlapis</a>
+                    <a href="for-organizers.html" class="nav-link" title="Organizatoriams – informacija renginių organizatoriams">Organizatoriams</a>
+                    <a href="help-center.html" class="nav-link" title="Pagalba – DUK ir pagalbos centras">Pagalba</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="header-actions" id="authActions"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Sukurti Renginį</h1>
+            <p>Užpildykite formą ir pradėkite kurti savo renginį</p>
+        </div>
+
+        <div class="form-card">
+            <div class="success-message" id="successMessage">
+                ✓ Renginys sėkmingai sukurtas! Jis bus peržiūrėtas administratoriaus.
+            </div>
+
+            <form id="eventForm">
+                <div class="form-group">
+                    <label for="title">Renginio pavadinimas <span class="required">*</span></label>
+                    <input type="text" id="title" name="title" required placeholder="Pvz.: Vasaros muzikos festivalis">
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Kategorija <span class="required">*</span></label>
+                    <select id="category" name="category" required>
+                        <option value="">Pasirinkite kategoriją</option>
+                        <option value="muzika">🎵 Muzika</option>
+                        <option value="verslas">💼 Verslas</option>
+                        <option value="menas">🎨 Menas</option>
+                        <option value="sportas">⚽ Sportas</option>
+                        <option value="maistas">🍔 Maistas</option>
+                        <option value="technologijos">💻 Technologijos</option>
+                        <option value="svietimas">📚 Švietimas</option>
+                        <option value="pramogos">🎭 Pramogos</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date">Data <span class="required">*</span></label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="time">Laikas <span class="required">*</span></label>
+                        <input type="time" id="time" name="time" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Vieta <span class="required">*</span></label>
+                    <input type="text" id="location" name="location" required placeholder="Pvz.: Vilnius, Lukiškių aikštė 1">
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Kaina (€) <span class="required">*</span></label>
+                    <input type="number" id="price" name="price" min="0" step="0.01" required placeholder="0.00">
+                    <div class="form-help">Įveskite 0, jei renginys nemokamas</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Aprašymas <span class="required">*</span></label>
+                    <textarea id="description" name="description" required placeholder="Aprašykite savo renginį..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="imageUrl">Nuotraukos URL</label>
+                    <input type="url" id="imageUrl" name="imageUrl" placeholder="https://example.com/image.jpg">
+                    <div class="form-help">Neprivalomas laukas. Įkelkite nuotrauką į bet kokį nuotraukų talpyklą ir įklijuokite nuorodą</div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="window.history.back()">Atšaukti</button>
+                    <button type="submit" class="btn btn-primary">Sukurti renginį</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                title: document.getElementById('title').value,
+                category: document.getElementById('category').value,
+                date: document.getElementById('date').value,
+                time: document.getElementById('time').value,
+                location: document.getElementById('location').value,
+                price: document.getElementById('price').value,
+                description: document.getElementById('description').value,
+                imageUrl: document.getElementById('imageUrl').value,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+
+            // Get current user from localStorage
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            formData.organizerId = currentUser.id || 'user-' + Date.now();
+
+            // Save to localStorage
+            const events = JSON.parse(localStorage.getItem('pendingEvents') || '[]');
+            events.push(formData);
+            localStorage.setItem('pendingEvents', JSON.stringify(events));
+
+            // Show success message
+            document.getElementById('successMessage').classList.add('show');
+            
+            // Reset form
+            this.reset();
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                document.getElementById('successMessage').classList.remove('show');
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

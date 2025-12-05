@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renginiai Vilniuje - CityEvents</title>
+    
+
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/city-map.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="index.html" class="logo">CityEvents</a>
+                <nav class="nav">
+                    <a href="index.html#events" class="nav-link" title="Renginiai – pagrindinė renginių peržiūra">Renginiai</a>
+                    <a href="city-map.html" class="nav-link" title="Žemėlapis – vizualus renginių žemėlapis">Žemėlapis</a>
+                    <a href="for-organizers.html" class="nav-link" title="Organizatoriams – informacija renginių organizatoriams">Organizatoriams</a>
+                    <a href="help-center.html" class="nav-link" title="Pagalba – DUK ir pagalbos centras">Pagalba</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="header-actions" id="authActions"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="breadcrumbs">
+        <a href="index.html">Pradžia</a>
+        <span>/</span>
+        <a href="#">Lietuva</a>
+        <span>/</span>
+        <a href="#">Vilnius</a>
+        <span>/</span>
+        <span>Renginiai šį savaitgalį</span>
+    </div>
+
+    <div class="main-container">
+        <div class="page-header">
+            <h1>Renginiai šį savaitgalį Vilniuje</h1>
+            <p>Atrask populiariausius renginius savo mieste arba rask ką nors naujo.</p>
+        </div>
+
+        <!-- Filters Sidebar -->
+        <aside class="filters-sidebar" id="filtersSidebar">
+            <h2 class="filters-title">Filtrai</h2>
+
+            <div class="active-filters">
+                <span style="font-size: 0.8125rem; color: var(--muted-foreground);">1 filtras taikomas</span>
+                <div class="filter-tag">
+                    Šį savaitgalį
+                    <button onclick="removeFilter(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6 6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <button class="clear-all" onclick="clearAllFilters()">Išvalyti viską</button>
+            </div>
+
+            <div class="filter-section">
+                <h3>Kategorija</h3>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="business">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 7h-9M14 17H5M17 17a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM7 7a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                    </svg>
+                    Verslas
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="food">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8ZM6 1v3M10 1v3M14 1v3"/>
+                    </svg>
+                    Maistas ir gėrimai
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="health">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                    </svg>
+                    Sveikata
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="music">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18V5l12-2v13M9 18c0 1.66-1.34 3-3 3s-3-1.34-3-3 1.34-3 3-3 3 1.34 3 3ZM21 16c0 1.66-1.34 3-3 3s-3-1.34-3-3 1.34-3 3-3 3 1.34 3 3Z"/>
+                    </svg>
+                    Muzika
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="category" value="art">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/>
+                        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2Z"/>
+                    </svg>
+                    Menas
+                </label>
+                <button class="view-more">Rodyti daugiau</button>
+            </div>
+
+            <div class="filter-section">
+                <h3>Data</h3>
+                <label class="filter-option">
+                    <input type="radio" name="date" value="today">
+                    Šiandien
+                </label>
+                <label class="filter-option">
+                    <input type="radio" name="date" value="tomorrow">
+                    Rytoj
+                </label>
+                <label class="filter-option">
+                    <input type="radio" name="date" value="weekend" checked>
+                    Šį savaitgalį
+                </label>
+                <label class="filter-option">
+                    <input type="radio" name="date" value="custom">
+                    Pasirinkti datą...
+                </label>
+            </div>
+
+            <div class="filter-section">
+                <h3>Rajonas</h3>
+                <label class="filter-option">
+                    <input type="checkbox" name="neighborhood" value="senamiestis">
+                    Senamiestis
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="neighborhood" value="snipiskes">
+                    Šnipiškės
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="neighborhood" value="naujamiestis">
+                    Naujamiestis
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="neighborhood" value="uzupis">
+                    Užupis
+                </label>
+            </div>
+
+            <div class="filter-section">
+                <h3>Kaina</h3>
+                <label class="filter-option">
+                    <input type="checkbox" name="price" value="free">
+                    Nemokami
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" name="price" value="paid">
+                    Mokami
+                </label>
+            </div>
+        </aside>
+
+        <!-- Events List -->
+        <main class="events-content">
+            <button class="mobile-filter-toggle" onclick="toggleFilters()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                </svg>
+                Filtrai
+            </button>
+
+            <p class="events-count">Rasta <strong>12</strong> renginių</p>
+
+            <div id="eventsList">
+                <!-- Events will be populated by JS -->
+            </div>
+        </main>
+
+        <!-- Map Section -->
+        <aside class="map-section">
+            <div class="map-container" id="mapContainer">
+                <div class="map-placeholder">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    <p>Vilniaus žemėlapis</p>
+                </div>
+                
+                <!-- Sample markers -->
+                <div class="map-marker" style="top: 30%; left: 45%;" title="Vasaros muzikos festivalis">
+                    <span>1</span>
+                </div>
+                <div class="map-marker" style="top: 45%; left: 55%;" title="Maisto turgus">
+                    <span>2</span>
+                </div>
+                <div class="map-marker" style="top: 60%; left: 40%;" title="Meno paroda">
+                    <span>3</span>
+                </div>
+                <div class="map-marker" style="top: 35%; left: 65%;" title="Tech konferencija">
+                    <span>4</span>
+                </div>
+                <div class="map-marker" style="top: 55%; left: 30%;" title="Jogas parke">
+                    <span>5</span>
+                </div>
+
+                <button class="map-toggle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+                        <line x1="9" x2="9" y1="3" y2="18"/>
+                        <line x1="15" x2="15" y1="6" y2="21"/>
+                    </svg>
+                    Žemėlapis
+                </button>
+            </div>
+        </aside>
+    </div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        // Mock event data
+        const events = [
+            {
+                id: 1,
+                title: "Vasaros muzikos festivalis 2024",
+                date: "Gruodžio 7, Šeštadienis • 18:00",
+                location: "Vingio parkas, Vilnius",
+                image: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400&h=300&fit=crop",
+                price: "Nuo 25€",
+                category: "Muzika",
+                liked: false
+            },
+            {
+                id: 2,
+                title: "Gatvės maisto festivalis",
+                date: "Gruodžio 7, Šeštadienis • 11:00",
+                location: "Tymo turgus, Vilnius",
+                image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop",
+                price: "Nemokamas",
+                category: "Maistas",
+                liked: true
+            },
+            {
+                id: 3,
+                title: "Šiuolaikinio meno paroda",
+                date: "Gruodžio 7-8 • 10:00 - 20:00",
+                location: "MO muziejus, Vilnius",
+                image: "https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=400&h=300&fit=crop",
+                price: "12€",
+                category: "Menas",
+                liked: false
+            },
+            {
+                id: 4,
+                title: "Tech Startup konferencija",
+                date: "Gruodžio 8, Sekmadienis • 09:00",
+                location: "Vilnius Tech Park",
+                image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=300&fit=crop",
+                price: "Nuo 49€",
+                category: "Verslas",
+                liked: false
+            },
+            {
+                id: 5,
+                title: "Ryto joga Bernardinų sode",
+                date: "Gruodžio 7, Šeštadienis • 08:00",
+                location: "Bernardinų sodas, Vilnius",
+                image: "https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=400&h=300&fit=crop",
+                price: "Nemokamas",
+                category: "Sveikata",
+                liked: true
+            },
+            {
+                id: 6,
+                title: "Stand-up komedijos vakaras",
+                date: "Gruodžio 7, Šeštadienis • 20:00",
+                location: "Forum Palace, Vilnius",
+                image: "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=400&h=300&fit=crop",
+                price: "15€",
+                category: "Pramogos",
+                liked: false
+            },
+            {
+                id: 7,
+                title: "Kalėdinis mugė senamiestyje",
+                date: "Gruodžio 7-8 • 10:00 - 22:00",
+                location: "Katedros aikštė, Vilnius",
+                image: "https://images.unsplash.com/photo-1512389142860-9c449e58a814?w=400&h=300&fit=crop",
+                price: "Nemokamas",
+                category: "Festivalis",
+                liked: false
+            },
+            {
+                id: 8,
+                title: "Fotografijos dirbtuvės pradedantiesiems",
+                date: "Gruodžio 8, Sekmadienis • 14:00",
+                location: "Šiuolaikinio meno centras, Vilnius",
+                image: "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&h=300&fit=crop",
+                price: "35€",
+                category: "Kursai",
+                liked: false
+            }
+        ];
+
+        // Render events
+        function renderEvents() {
+            const eventsList = document.getElementById('eventsList');
+            eventsList.innerHTML = events.map(event => `
+                <article class="event-card" onclick="viewEvent(${event.id})">
+                    <img src="${event.image}" alt="${event.title}" class="event-image">
+                    <div class="event-details">
+                        <span class="event-date">${event.date}</span>
+                        <h3 class="event-title">${event.title}</h3>
+                        <p class="event-location">${event.location}</p>
+                        <div class="event-meta">
+                            <span class="event-price">${event.price}</span>
+                            <span class="event-category">${event.category}</span>
+                        </div>
+                    </div>
+                    <div class="event-actions">
+                        <button class="like-btn ${event.liked ? 'active' : ''}" onclick="toggleLike(event, ${event.id})">
+                            <svg viewBox="0 0 24 24" fill="${event.liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // Toggle like
+        function toggleLike(e, id) {
+            e.stopPropagation();
+            const event = events.find(ev => ev.id === id);
+            if (event) {
+                event.liked = !event.liked;
+                renderEvents();
+            }
+        }
+
+        // View event
+        function viewEvent(id) {
+            window.location.href = `event-details.html?id=${id}`;
+        }
+
+        // Toggle mobile filters
+        function toggleFilters() {
+            document.getElementById('filtersSidebar').classList.toggle('active');
+        }
+
+        // Remove filter tag
+        function removeFilter(btn) {
+            btn.closest('.filter-tag').remove();
+        }
+
+        // Clear all filters
+        function clearAllFilters() {
+            document.querySelectorAll('.filter-option input').forEach(input => {
+                input.checked = false;
+            });
+            document.querySelector('.active-filters').innerHTML = '';
+        }
+
+        // Initialize
+        renderEvents();
+    </script>
+</body>
+</html>

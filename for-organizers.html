@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizatoriams – CityEvents</title>
+    <meta name="description" content="CityEvents organizatoriams – valdykite renginius vienoje vietoje.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    
+    
+
+    <link rel="stylesheet" href="assets/css/for-organizers.css">
+</head>
+<body data-page="for-organizers">
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="index.html" class="logo">CityEvents</a>
+                <nav class="nav">
+                    <a href="index.html#events" class="nav-link" title="Renginiai – pagrindinė renginių peržiūra">Renginiai</a>
+                    <a href="city-map.html" class="nav-link" title="Žemėlapis – vizualus renginių žemėlapis">Žemėlapis</a>
+                    <a href="for-organizers.html" class="nav-link" title="Organizatoriams – informacija renginių organizatoriams">Organizatoriams</a>
+                    <a href="help-center.html" class="nav-link" title="Pagalba – DUK ir pagalbos centras">Pagalba</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="header-actions" id="authActions"></div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Tapkite renginių dalimi</h1>
+                <p>Pasiekite tūkstančius miesto lankytojų, aiškiai pateikite informaciją ir patogiai valdykite bilietus bei dalyvius.</p>
+                <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <a href="create-event.html" class="btn btn-primary">Sukurti renginį</a>
+                    <a href="organizer-dashboard.html" class="btn btn-outline">Mano renginiai</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="events-section">
+            <div class="section-header">
+                <div>
+                    <h2>Kaip pradėti?</h2>
+                    <p>Trys paprasti žingsniai iki jūsų renginio sėkmės.</p>
+                </div>
+            </div>
+            <div class="events-grid">
+                <article class="step-card">
+                    <div class="step-number">1</div>
+                    <h3 class="event-title">Susikurkite profilį</h3>
+                    <p>Prisijunkite prie CityEvents ir užpildykite organizatoriaus informaciją. Tai padės lankytojams atpažinti jūsų prekinį ženklą.</p>
+                </article>
+
+                <article class="step-card">
+                    <div class="step-number">2</div>
+                    <h3 class="event-title">Užregistruokite renginį</h3>
+                    <p>Įveskite pavadinimą, kategoriją, datą ir vietą. Pridėkite patrauklią iliustraciją, kad išsiskirtumėte žemėlapyje.</p>
+                </article>
+
+                <article class="step-card">
+                    <div class="step-number">3</div>
+                    <h3 class="event-title">Publikuokite ir stebėkite</h3>
+                    <p>Administratoriui patvirtinus, jūsų renginys taps matomas visiems. Stebėkite peržiūras ir atnaujinkite informaciją realiu laiku.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="events-section" style="background: white; padding: 4rem 1.5rem; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <div class="section-header">
+                <div>
+                    <h2>Kodėl verta rinktis CityEvents?</h2>
+                    <p>Įrankiai, sukurti auginti jūsų auditoriją.</p>
+                </div>
+            </div>
+            <div class="events-grid">
+                <article class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                    </div>
+                    <h3 class="event-title">Interaktyvus žemėlapis</h3>
+                    <p>Lankytojai mato renginius pagal savo buvimo vietą. Puikus būdas pritraukti spontaniškus lankytojus.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                    <h3 class="event-title">Lengvas atrandamumas</h3>
+                    <p>Kategorijos ir išmanūs filtrai užtikrina, kad jūsų renginį ras būtent ta auditorija, kuriai jis aktualus.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    </div>
+                    <h3 class="event-title">Lojalumo auginimas</h3>
+                    <p>Funkcija „Mėgstami“ leidžia lankytojams išsaugoti renginį, o jums – priminti apie save prieš renginį.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="events-section" style="margin-top: 4rem;">
+            <div class="section-header">
+                <h2>Greitieji veiksmai</h2>
+            </div>
+            <div class="events-grid">
+                <article class="event-card" style="background: var(--primary); color: white; padding: 2rem; border-radius: 16px; text-align: center;">
+                    <h3 class="event-title" style="color: white;">Sukurti naują renginį</h3>
+                    <p style="color: rgba(255,255,255,0.8);">Užpildykite formą ir startuokite.</p>
+                    <a href="create-event.html" class="btn" style="background: white; color: var(--primary); margin-top: 1rem;">Pradėti</a>
+                </article>
+
+                <article class="event-card" style="background: #334155; color: white; padding: 2rem; border-radius: 16px; text-align: center;">
+                    <h3 class="event-title" style="color: white;">Mano renginiai</h3>
+                    <p style="color: rgba(255,255,255,0.8);">Valdykite esamų renginių informaciją.</p>
+                    <a href="organizer-events.html" class="btn" style="background: transparent; border: 2px solid white; color: white; margin-top: 1rem;">Peržiūrėti</a>
+                </article>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-column footer-brand">
+                <a href="index.html" class="logo" style="color: white;">CityEvents</a>
+                <p>Miesto renginių platforma.</p>
+            </div>
+            <div class="footer-column">
+                <h4>Navigacija</h4>
+                <a href="index.html#events" style="color: #94a3b8; text-decoration: none; display: block; margin-bottom: 0.5rem;">Renginiai</a>
+                <a href="city-map.html" style="color: #94a3b8; text-decoration: none; display: block; margin-bottom: 0.5rem;">Žemėlapis</a>
+                <a href="for-organizers.html" style="color: #94a3b8; text-decoration: none; display: block; margin-bottom: 0.5rem;">Organizatoriams</a>
+            </div>
+            <div class="footer-column">
+                <h4>Naudinga</h4>
+                <a href="help-center.html" style="color: #94a3b8; text-decoration: none; display: block; margin-bottom: 0.5rem;">Pagalbos centras</a>
+                <a href="signup.html" style="color: #94a3b8; text-decoration: none; display: block; margin-bottom: 0.5rem;">Registracija</a>
+            </div>
+            <div class="footer-column">
+                <h4>Naujienlaiškis</h4>
+                <form class="footer-form" onsubmit="event.preventDefault()">
+                    <input type="email" placeholder="El. paštas" style="padding: 0.5rem; border-radius: 4px; border: none; width: 100%; margin-bottom: 0.5rem;">
+                    <button type="submit" class="btn" style="width: 100%; background: var(--primary); color: white; border: none;">Prenumeruoti</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom" style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #334155;">
+            <p>© 2025 CityEvents. Visos teisės saugomos.</p>
+        </div>
+    </footer>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

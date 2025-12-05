@@ -1,0 +1,497 @@
+        /* Global overrides removed to inherit from style.css */
+        
+        /* Search Styles (Restored) */
+        .search-container {
+            display: flex;
+            flex: 1;
+            max-width: 600px;
+            gap: 0.5rem;
+            margin: 0 1.5rem; /* Add some margin for navbar context */
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.625rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+        }
+
+        .search-btn {
+            padding: 0.625rem 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--foreground);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .breadcrumbs a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumbs span {
+            color: var(--muted-foreground);
+        }
+
+        /* Page Title */
+        .page-header {
+            grid-column: 1 / -1;
+            margin-bottom: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: var(--muted-foreground);
+        }
+
+        /* Main Layout */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem 2rem;
+            display: grid;
+            grid-template-columns: 240px 1fr 400px;
+            gap: 1.5rem;
+        }
+
+        /* Filters Sidebar */
+        .filters-sidebar {
+            background: var(--background);
+            border-radius: 12px;
+            padding: 1.25rem;
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+
+        .filters-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .filter-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-section h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--foreground);
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: var(--foreground);
+            transition: color 0.2s;
+        }
+
+        .filter-option:hover {
+            color: var(--primary);
+        }
+
+        .filter-option input[type="checkbox"],
+        .filter-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .filter-option svg {
+            width: 18px;
+            height: 18px;
+            color: var(--muted-foreground);
+        }
+
+        .view-more {
+            color: var(--primary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0.5rem 0;
+        }
+
+        .view-more:hover {
+            text-decoration: underline;
+        }
+
+        /* Active Filters */
+        .active-filters {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            background: var(--accent);
+            border-radius: 20px;
+            font-size: 0.8125rem;
+        }
+
+        .filter-tag button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted-foreground);
+            display: flex;
+            align-items: center;
+        }
+
+        .clear-all {
+            color: var(--primary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .clear-all:hover {
+            text-decoration: underline;
+        }
+
+        /* Events List */
+        .events-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .events-count {
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+            margin-bottom: 0.5rem;
+        }
+
+        .event-card {
+            background: var(--background);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        .event-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .event-image {
+            width: 180px;
+            height: 120px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .event-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .event-date {
+            font-size: 0.8125rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .event-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.375rem;
+            color: var(--foreground);
+            line-height: 1.4;
+        }
+
+        .event-location {
+            font-size: 0.8125rem;
+            color: var(--muted-foreground);
+            margin-bottom: 0.5rem;
+        }
+
+        .event-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: auto;
+        }
+
+        .event-price {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        .event-category {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--accent);
+            border-radius: 4px;
+            color: var(--muted-foreground);
+        }
+
+        .event-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+
+        .like-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: var(--muted-foreground);
+            transition: color 0.2s;
+        }
+
+        .like-btn:hover,
+        .like-btn.active {
+            color: #ef4444;
+        }
+
+        .like-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Map Section */
+        .map-section {
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 100px);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e8f4ea 0%, #f0e8f4 50%, #f4e8e8 100%);
+            position: relative;
+        }
+
+        .map-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .map-placeholder svg {
+            width: 64px;
+            height: 64px;
+            color: var(--primary);
+            opacity: 0.5;
+        }
+
+        .map-placeholder p {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+        }
+
+        .map-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.625rem 1rem;
+            background: var(--background);
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .map-toggle:hover {
+            background: var(--accent);
+        }
+
+        /* Map Markers */
+        .map-marker {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .map-marker:hover {
+            transform: rotate(-45deg) scale(1.2);
+        }
+
+        .map-marker span {
+            transform: rotate(45deg);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 220px 1fr;
+            }
+            .map-section {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-wrap: wrap;
+            }
+            .search-container {
+                order: 3;
+                max-width: 100%;
+                width: 100%;
+            }
+            .header-nav {
+                display: none;
+            }
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            .filters-sidebar {
+                position: static;
+            }
+            .event-card {
+                flex-direction: column;
+            }
+            .event-image {
+                width: 100%;
+                height: 160px;
+            }
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Mobile Filter Toggle */
+        .mobile-filter-toggle {
+            display: none;
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-filter-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+            .filters-sidebar {
+                display: none;
+            }
+            .filters-sidebar.active {
+                display: block;
+            }
+        }

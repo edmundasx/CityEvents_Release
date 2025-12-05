@@ -1,0 +1,102 @@
+/* Inherits from style.css */
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, #ff9f43 100%);
+    color: white;
+    padding: 5rem 1rem;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.hero h1 { margin: 0 0 1rem 0; font-size: 2.5rem; font-weight: 800; }
+.hero p { opacity: 0.9; font-size: 1.125rem; max-width: 600px; margin: 0 auto; }
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+.btn-primary { background: white; color: var(--primary); border: 2px solid white; }
+.btn-primary:hover { background: transparent; color: white; }
+
+.btn-outline { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.7); }
+.btn-outline:hover { border-color: white; background: rgba(255,255,255,0.1); }
+
+/* Card styles for darker backgrounds (if used elsewhere) */
+.event-card .btn-outline { color: var(--primary); border-color: var(--primary); }
+.event-card .btn-outline:hover { background: var(--primary); color: white; }
+.event-card .btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* Sections */
+.events-section {
+    max-width: 1100px;
+    margin: 0 auto 4rem auto;
+    padding: 0 1.5rem;
+}
+
+.section-header { text-align: center; margin-bottom: 2.5rem; }
+.section-header h2 { font-size: 2rem; color: var(--foreground); margin-bottom: 0.5rem; }
+.section-header p { color: var(--muted-foreground); }
+
+/* Grid */
+.events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+/* Cards */
+.event-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: var(--primary);
+}
+
+.icon-box {
+    background-color: rgba(255, 107, 53, 0.1);
+    color: var(--primary);
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 1.25rem;
+    display: inline-flex;
+}
+
+.event-title {
+    margin-top: 0;
+    font-size: 1.25rem;
+    color: var(--foreground);
+    margin-bottom: 0.75rem;
+}
+
+.event-content p { color: var(--muted-foreground); font-size: 0.95rem; margin-bottom: 0; }
+
+        /* Header/Nav tweaks (Optional basic styling if not present) */
+        .header { background: white; border-bottom: 1px solid #e2e8f0; padding: 1rem 0; }
+        .header-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; padding: 0 1.5rem; align-items: center; }
+        .nav a { color: var(--text-main); text-decoration: none; margin-left: 1.5rem; font-weight: 500; }
+        .logo { font-weight: 900; font-size: 1.5rem; color: var(--primary); text-decoration: none; }
+        
+        /* Footer */
+        .footer { background: #1e293b; color: #cbd5e1; padding: 4rem 1.5rem; margin-top: auto; }
+        .footer-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem; }
+        .footer a { color: #cbd5e1; text-decoration: none; display: block; margin-bottom: 0.5rem; }
+        .footer a:hover { color: white; }
+        .footer h4 { color: white; margin-bottom: 1.5rem; }
+        .footer-bottom { text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #334155; font-size: 0.875rem; }

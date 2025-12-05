@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizatoriaus skydelis - CityEvents</title>
+    
+
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/organizer-dashboard.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="index.html" class="logo">🎉 CityEvents</a>
+                <nav class="nav">
+                    <a href="index.html" class="nav-link">Naršyti renginius</a>
+                    <a href="create-event.html" class="nav-link">Sukurti renginį</a>
+                    <a href="organizer-events.html" class="nav-link">Mano renginiai</a>
+                    <a href="organizer-dashboard.html" class="nav-link active">Skydelis</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="user-menu">
+                    <div class="user-avatar">JD</div>
+                    <span>Jonas D.</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>👋 Sveiki, Jonas!</h1>
+            <p>Čia galite valdyti savo renginius ir stebėti statistiką</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="statsGrid">
+            <!-- Stats will be rendered here -->
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="create-event.html" class="action-card">
+                <div class="action-icon">➕</div>
+                <div class="action-content">
+                    <h3>Sukurti naują renginį</h3>
+                    <p>Paskelbkite naują renginį ir pasiekite dalyvius</p>
+                </div>
+            </a>
+            <a href="organizer-events.html" class="action-card">
+                <div class="action-icon">📋</div>
+                <div class="action-content">
+                    <h3>Peržiūrėti mano renginius</h3>
+                    <p>Valdykite visus savo pateiktus renginius</p>
+                </div>
+            </a>
+            <a href="city-map.html" class="action-card">
+                <div class="action-icon">🗺️</div>
+                <div class="action-content">
+                    <h3>Miesto žemėlapis</h3>
+                    <p>Peržiūrėkite visus renginius žemėlapyje</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Left Column -->
+            <div class="left-column">
+                <!-- Recent Events -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="card-header">
+                        <h2>📅 Naujausi renginiai</h2>
+                        <a href="organizer-events.html">Peržiūrėti visus →</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="recent-events" id="recentEvents">
+                            <!-- Events will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🔔 Paskutinė veikla</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-list" id="activityList">
+                            <!-- Activity will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <!-- Profile Card -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="profile-card">
+                        <div class="profile-avatar" id="profileAvatar">JD</div>
+                        <h3 id="profileName">Jonas Daukša</h3>
+                        <p class="role">Organizatorius</p>
+                        <p class="email" id="profileEmail">jonas@example.com</p>
+                        <button class="profile-btn" onclick="openProfileModal()">
+                            ✏️ Redaguoti profilį
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tips -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>💡 Patarimai</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="tips-list">
+                            <div class="tip-item">
+                                <span>📸</span>
+                                <p>Pridėkite kokybiškas nuotraukas - renginiai su vaizdais sulaukia 3x daugiau peržiūrų</p>
+                            </div>
+                            <div class="tip-item">
+                                <span>📝</span>
+                                <p>Rašykite išsamius aprašymus su visa reikalinga informacija dalyviams</p>
+                            </div>
+                            <div class="tip-item">
+                                <span>⏰</span>
+                                <p>Paskelbkite renginius bent 2 savaites prieš datą</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Redaguoti profilį</h2>
+                <button class="modal-close" onclick="closeProfileModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label for="editName">Vardas ir pavardė</label>
+                        <input type="text" id="editName" placeholder="Įveskite vardą">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail">El. paštas</label>
+                        <input type="email" id="editEmail" placeholder="Įveskite el. paštą">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPhone">Telefono numeris</label>
+                        <input type="tel" id="editPhone" placeholder="+370 600 00000">
+                    </div>
+                    <div class="form-group">
+                        <label for="editCompany">Organizacijos pavadinimas</label>
+                        <input type="text" id="editCompany" placeholder="Įveskite organizacijos pavadinimą">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeProfileModal()">Atšaukti</button>
+                <button class="btn btn-primary" onclick="saveProfile()">Išsaugoti</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span>✓</span>
+        <span id="toastMessage">Profilis atnaujintas sėkmingai!</span>
+    </div>
+
+    <script>
+        // Mock data
+        const organizerData = {
+            name: 'Jonas Daukša',
+            email: 'jonas@example.com',
+            phone: '+370 612 34567',
+            company: 'Vilniaus Renginiai UAB'
+        };
+
+        const events = [
+            {
+                id: 1,
+                title: "Kalėdinis mugė Katedros aikštėje",
+                image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400",
+                date: "Gruodžio 20, 10:00",
+                status: "approved"
+            },
+            {
+                id: 2,
+                title: "Naujametinis koncertas",
+                image: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400",
+                date: "Gruodžio 31, 22:00",
+                status: "pending"
+            },
+            {
+                id: 3,
+                title: "Verslo konferencija 2025",
+                image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400",
+                date: "Sausio 15, 09:00",
+                status: "approved"
+            },
+            {
+                id: 4,
+                title: "Sporto šventė vaikams",
+                image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400",
+                date: "Sausio 20, 11:00",
+                status: "rejected"
+            }
+        ];
+
+        const activities = [
+            { type: 'success', icon: '✓', message: 'Renginys "Kalėdinis mugė" patvirtintas', time: 'Prieš 2 val.' },
+            { type: 'warning', icon: '⏳', message: 'Renginys "Naujametinis koncertas" laukia patvirtinimo', time: 'Prieš 5 val.' },
+            { type: 'info', icon: '👁️', message: '156 naujos peržiūros jūsų renginiuose', time: 'Šiandien' },
+            { type: 'danger', icon: '✗', message: 'Renginys "Sporto šventė" atmestas', time: 'Vakar' },
+            { type: 'success', icon: '👤', message: '12 naujų registracijų į "Verslo konferencija"', time: 'Vakar' }
+        ];
+
+        // Initialize
+        function init() {
+            loadProfileData();
+            renderStats();
+            renderRecentEvents();
+            renderActivity();
+        }
+
+        // Load profile data from localStorage
+        function loadProfileData() {
+            const saved = localStorage.getItem('organizerProfile');
+            if (saved) {
+                Object.assign(organizerData, JSON.parse(saved));
+            }
+            updateProfileDisplay();
+        }
+
+        // Update profile display
+        function updateProfileDisplay() {
+            const initials = organizerData.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('profileAvatar').textContent = initials;
+            document.getElementById('profileName').textContent = organizerData.name;
+            document.getElementById('profileEmail').textContent = organizerData.email;
+            
+            // Update header avatar
+            document.querySelector('.user-avatar').textContent = initials;
+            document.querySelector('.user-menu span').textContent = organizerData.name.split(' ')[0] + ' ' + organizerData.name.split(' ')[1]?.[0] + '.';
+        }
+
+        // Render stats
+        function renderStats() {
+            const approved = events.filter(e => e.status === 'approved').length;
+            const pending = events.filter(e => e.status === 'pending').length;
+            const rejected = events.filter(e => e.status === 'rejected').length;
+
+            const stats = [
+                { icon: '📊', iconClass: 'primary', value: events.length, label: 'Viso renginių' },
+                { icon: '✓', iconClass: 'success', value: approved, label: 'Patvirtinta' },
+                { icon: '⏳', iconClass: 'warning', value: pending, label: 'Laukia patvirtinimo' },
+                { icon: '✗', iconClass: 'danger', value: rejected, label: 'Atmesta' }
+            ];
+
+            document.getElementById('statsGrid').innerHTML = stats.map(stat => `
+                <div class="stat-card">
+                    <div class="icon ${stat.iconClass}">${stat.icon}</div>
+                    <div class="value">${stat.value}</div>
+                    <div class="label">${stat.label}</div>
+                </div>
+            `).join('');
+        }
+
+        // Render recent events
+        function renderRecentEvents() {
+            document.getElementById('recentEvents').innerHTML = events.map(event => `
+                <div class="recent-event-item">
+                    <img src="${event.image}" alt="${event.title}">
+                    <div class="recent-event-info">
+                        <h4>${event.title}</h4>
+                        <p>📅 ${event.date}</p>
+                    </div>
+                    <div class="recent-event-status">
+                        <span class="status-badge ${event.status}">
+                            ${getStatusText(event.status)}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Get status text
+        function getStatusText(status) {
+            const texts = {
+                approved: 'Patvirtinta',
+                pending: 'Laukiama',
+                rejected: 'Atmesta'
+            };
+            return texts[status] || status;
+        }
+
+        // Render activity
+        function renderActivity() {
+            document.getElementById('activityList').innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon ${activity.type}">${activity.icon}</div>
+                    <div class="activity-content">
+                        <p>${activity.message}</p>
+                        <span>${activity.time}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Modal functions
+        function openProfileModal() {
+            document.getElementById('editName').value = organizerData.name;
+            document.getElementById('editEmail').value = organizerData.email;
+            document.getElementById('editPhone').value = organizerData.phone;
+            document.getElementById('editCompany').value = organizerData.company;
+            document.getElementById('profileModal').classList.add('active');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.remove('active');
+        }
+
+        function saveProfile() {
+            organizerData.name = document.getElementById('editName').value;
+            organizerData.email = document.getElementById('editEmail').value;
+            organizerData.phone = document.getElementById('editPhone').value;
+            organizerData.company = document.getElementById('editCompany').value;
+
+            localStorage.setItem('organizerProfile', JSON.stringify(organizerData));
+            updateProfileDisplay();
+            closeProfileModal();
+            showToast('Profilis atnaujintas sėkmingai!');
+        }
+
+        // Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show', 'success');
+            setTimeout(() => {
+                toast.classList.remove('show', 'success');
+            }, 3000);
+        }
+
+        // Close modal on overlay click
+        document.getElementById('profileModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeProfileModal();
+            }
+        });
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
