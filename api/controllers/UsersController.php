@@ -1,10 +1,12 @@
 <?php
 
 require_once __DIR__ . '/../helpers.php';
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../models/User.php';
 
-function handleUsers(string $method, array &$data, array $input, string $dataFile): void
+function handleUsers(string $method, array $input): void
 {
-    $pdo = get_pdo();
+    $userModel = new User();
 
     switch ($method) {
         case 'GET':
@@ -14,24 +16,12 @@ function handleUsers(string $method, array &$data, array $input, string $dataFil
                 return;
             }
 
-            if ($pdo) {
-                $statement = $pdo->prepare('SELECT * FROM users WHERE id = :id LIMIT 1');
-                $statement->execute([':id' => $id]);
-                $user = $statement->fetch();
-                if ($user) {
-                    respond(['user' => sanitize_user($user)]);
-                    return;
-                }
-
-                respond(['error' => 'Naudotojas nerastas'], 404);
+            $user = $userModel->find((int)$id);
+            if ($user) {
+                respond(['user' => sanitize_user($user)]);
                 return;
             }
-            foreach ($data['users'] as $user) {
-                if ((string)$user['id'] === (string)$id) {
-                    respond(['user' => sanitize_user($user)]);
-                    return;
-                }
-            }
+
             respond(['error' => 'Naudotojas nerastas'], 404);
             return;
 
@@ -52,56 +42,19 @@ function handleUsers(string $method, array &$data, array $input, string $dataFil
                 return;
             }
 
-            if ($pdo) {
-                $duplicateCheck = $pdo->prepare('SELECT id FROM users WHERE LOWER(email) = LOWER(:email) LIMIT 1');
-                $duplicateCheck->execute([':email' => $input['email']]);
-                if ($duplicateCheck->fetch()) {
-                    respond(['error' => 'Vartotojas su tokiu el. paštu jau egzistuoja'], 400);
-                    return;
-                }
-
-                $statement = $pdo->prepare(
-                    'INSERT INTO users (name, email, password, role, phone) VALUES (:name, :email, :password, :role, :phone)'
-                );
-                $statement->execute([
-                    ':name' => trim($input['name']),
-                    ':email' => strtolower($input['email']),
-                    ':password' => $input['password'],
-                    ':role' => $input['role'],
-                    ':phone' => $input['phone'] ?? null,
-                ]);
-
-                $userId = (int)$pdo->lastInsertId();
-                $created = [
-                    'id' => $userId,
-                    'name' => trim($input['name']),
-                    'email' => strtolower($input['email']),
-                    'role' => $input['role'],
-                    'phone' => $input['phone'] ?? null,
-                ];
-
-                respond(['user' => $created], 201);
+            $existingUser = $userModel->findByEmail($input['email']);
+            if ($existingUser) {
+                respond(['error' => 'Vartotojas su tokiu el. paštu jau egzistuoja'], 400);
                 return;
             }
 
-            foreach ($data['users'] as $existingUser) {
-                if (strcasecmp($existingUser['email'], $input['email']) === 0) {
-                    respond(['error' => 'Vartotojas su tokiu el. paštu jau egzistuoja'], 400);
-                    return;
-                }
+            $user = $userModel->create($input);
+            if ($user) {
+                respond(['user' => sanitize_user($user)], 201);
+                return;
             }
-
-            $newId = round(microtime(true) * 1000);
-            $newUser = [
-                'id' => $newId,
-                'name' => trim($input['name']),
-                'email' => strtolower($input['email']),
-                'password' => $input['password'],
-                'role' => $input['role'],
-            ];
-            $data['users'][] = $newUser;
-            save_data($dataFile, $data);
-            respond(['user' => sanitize_user($newUser)], 201);
+            
+            respond(['error' => 'Nepavyko sukurti vartotojo'], 500);
             return;
 
         case 'PUT':
@@ -121,69 +74,14 @@ function handleUsers(string $method, array &$data, array $input, string $dataFil
                 return;
             }
 
-            if ($pdo) {
-                $id = $input['id'] ?? null;
-                if (!$id) {
-                    respond(['error' => 'Trūksta naudotojo ID'], 400);
-                    return;
-                }
+            $user = $userModel->update((int)$id, $input);
 
-                $allowedFields = ['name', 'email', 'password', 'role', 'phone'];
-                $setParts = [];
-                $params = [':id' => $id];
-
-                foreach ($allowedFields as $field) {
-                    if (array_key_exists($field, $input) && $input[$field] !== null && $input[$field] !== '') {
-                        if ($field === 'email' && !validate_email($input[$field])) {
-                            respond(['error' => 'Neteisingas el. pašto formatas'], 400);
-                            return;
-                        }
-                        if ($field === 'role' && !validate_user_role($input[$field])) {
-                            respond(['error' => 'Neteisinga rolė'], 400);
-                            return;
-                        }
-
-                        $setParts[] = "$field = :$field";
-                        $params[":$field"] = $field === 'email' ? strtolower($input[$field]) : $input[$field];
-                    }
-                }
-
-                if (empty($setParts)) {
-                    respond(['error' => 'Nėra laukų atnaujinimui'], 400);
-                    return;
-                }
-
-                $existing = $pdo->prepare('SELECT id FROM users WHERE id = :id LIMIT 1');
-                $existing->execute([':id' => $id]);
-                if (!$existing->fetch()) {
-                    respond(['error' => 'Naudotojas nerastas'], 404);
-                    return;
-                }
-
-                $updateQuery = 'UPDATE users SET ' . implode(', ', $setParts) . ' WHERE id = :id';
-                $update = $pdo->prepare($updateQuery);
-                $update->execute($params);
-
-                $fresh = $pdo->prepare('SELECT * FROM users WHERE id = :id LIMIT 1');
-                $fresh->execute([':id' => $id]);
-                $updated = $fresh->fetch();
-
-                respond(['user' => sanitize_user($updated)]);
+            if ($user) {
+                respond(['user' => sanitize_user($user)]);
                 return;
             }
 
-            foreach ($data['users'] as &$user) {
-                if ((string)$user['id'] === (string)$id) {
-                    $user = array_merge($user, array_filter($input, function ($value, $key) {
-                        return in_array($key, ['name', 'email', 'password', 'role', 'phone'], true) && $value !== null && $value !== '';
-                    }, ARRAY_FILTER_USE_BOTH));
-                    save_data($dataFile, $data);
-                    respond(['user' => sanitize_user($user)]);
-                    return;
-                }
-            }
-
-            respond(['error' => 'Naudotojas nerastas'], 404);
+            respond(['error' => 'Nepavyko atnaujinti vartotojo'], 500);
             return;
 
         case 'DELETE':
@@ -193,26 +91,9 @@ function handleUsers(string $method, array &$data, array $input, string $dataFil
                 return;
             }
 
-            if ($pdo) {
-                $statement = $pdo->prepare('DELETE FROM users WHERE id = :id');
-                $statement->execute([':id' => $id]);
-
-                if ($statement->rowCount() === 0) {
-                    respond(['error' => 'Naudotojas nerastas'], 404);
-                    return;
-                }
-
+            if ($userModel->delete((int)$id)) {
                 respond(['message' => 'Naudotojas pašalintas']);
                 return;
-            }
-
-            foreach ($data['users'] as $index => $user) {
-                if ((string)$user['id'] === (string)$id) {
-                    array_splice($data['users'], $index, 1);
-                    save_data($dataFile, $data);
-                    respond(['message' => 'Naudotojas pašalintas']);
-                    return;
-                }
             }
 
             respond(['error' => 'Naudotojas nerastas'], 404);

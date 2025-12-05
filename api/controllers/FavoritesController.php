@@ -1,8 +1,10 @@
 <?php
 
 require_once __DIR__ . '/../helpers.php';
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../models/Favorite.php';
 
-function handleFavorites(string $method, array &$data, array $input, string $dataFile): void
+function handleFavorites(string $method, array $input): void
 {
     if ($method === 'POST') {
         $missing = ensure_required_fields($input, ['event_id', 'user_id']);
@@ -11,15 +13,28 @@ function handleFavorites(string $method, array &$data, array $input, string $dat
             return;
         }
 
-        $entry = [
-            'id' => round(microtime(true) * 1000),
-            'event_id' => $input['event_id'],
-            'user_id' => $input['user_id'],
-            'tag' => $input['tag'] ?? 'favorite',
-        ];
-        $data['favorites'][] = $entry;
-        save_data($dataFile, $data);
-        respond(['favorite' => $entry], 201);
+        $favoriteModel = new Favorite();
+        $favorite = $favoriteModel->create($input);
+
+        if ($favorite) {
+            respond(['favorite' => $favorite], 201);
+            return;
+        }
+
+        respond(['error' => 'Nepavyko pridėti įsiminto renginio'], 500);
+        return;
+    }
+
+    if ($method === 'GET') {
+        $userId = $_GET['user_id'] ?? null;
+        if (!$userId) {
+            respond(['error' => 'Trūksta naudotojo ID'], 400);
+            return;
+        }
+
+        $favoriteModel = new Favorite();
+        $favorites = $favoriteModel->findByUser((int)$userId);
+        respond(['favorites' => $favorites]);
         return;
     }
 

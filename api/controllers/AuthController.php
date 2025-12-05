@@ -1,11 +1,11 @@
 <?php
 
 require_once __DIR__ . '/../helpers.php';
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../models/User.php';
 
-function handleAuth(string $method, array $data, array $input): void
+function handleAuth(string $method, array $input): void
 {
-    $pdo = get_pdo();
-
     if ($method !== 'POST') {
         respond(['error' => 'Nepalaikomas metodas'], 405);
         return;
@@ -17,25 +17,12 @@ function handleAuth(string $method, array $data, array $input): void
         return;
     }
 
-    if ($pdo) {
-        $statement = $pdo->prepare('SELECT * FROM users WHERE LOWER(email) = LOWER(:email) LIMIT 1');
-        $statement->execute([':email' => $input['email']]);
-        $user = $statement->fetch();
+    $userModel = new User();
+    $user = $userModel->findByEmail($input['email']);
 
-        if ($user && $user['password'] === $input['password']) {
-            respond(['user' => sanitize_user($user)]);
-            return;
-        }
-
-        respond(['error' => 'Neteisingi prisijungimo duomenys'], 401);
+    if ($user && password_verify($input['password'], $user['password'])) {
+        respond(['user' => sanitize_user($user)]);
         return;
-    }
-
-    foreach ($data['users'] as $user) {
-        if (strcasecmp($user['email'], $input['email']) === 0 && $user['password'] === $input['password']) {
-            respond(['user' => sanitize_user($user)]);
-            return;
-        }
     }
 
     respond(['error' => 'Neteisingi prisijungimo duomenys'], 401);

@@ -1,9 +1,13 @@
 <?php
 
 require_once __DIR__ . '/../helpers.php';
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../models/Notification.php';
 
-function handleNotifications(array $data): void
+function handleNotifications(): void
 {
-    respond(['notifications' => $data['notifications']]);
+    $notificationModel = new Notification();
+    $notifications = $notificationModel->findAll();
+    respond(['notifications' => $notifications]);
     return;
 }
