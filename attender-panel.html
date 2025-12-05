@@ -169,96 +169,82 @@
     <script src="assets/js/api.js"></script>
     <script src="assets/js/app.js"></script>
     <script>
-        // Mock data
-        const favoriteEvents = [
-            {
-                id: 1,
-                title: "Vasaros muzikos festivalis 2024",
-                category: "Muzika",
-                image: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400",
-                date: "2024-12-15",
-                displayDate: "Gruodžio 15, 18:00",
-                location: "Vilnius, Vingio parkas",
-                notifications: true
-            },
-            {
-                id: 2,
-                title: "Technologijų konferencija TechVilnius",
-                category: "Technologijos",
-                image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400",
-                date: "2024-12-20",
-                displayDate: "Gruodžio 20, 09:00",
-                location: "Kaunas, Forum Palace",
-                notifications: true
-            },
-            {
-                id: 3,
-                title: "Kalėdinė mugė senamiestyje",
-                category: "Pramogos",
-                image: "https://images.unsplash.com/photo-1482223250324-e0c08a3e0f1f?w=400",
-                date: "2024-12-24",
-                displayDate: "Gruodžio 24, 10:00",
-                location: "Vilnius, Rotušės aikštė",
-                notifications: false
-            }
-        ];
+        const attenderState = {
+            user: null,
+            favorites: [],
+            favoriteIds: new Set(),
+            events: [],
+            currentMonth: new Date().getMonth(),
+            currentYear: new Date().getFullYear(),
+        };
+        const fallbackImage = 'https://via.placeholder.com/400x250?text=CityEvents';
 
-        const recommendedEvents = [
-            {
-                id: 4,
-                title: "Jazz vakaras „Blue Note“",
-                category: "Muzika",
-                image: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400",
-                date: "Gruodžio 18",
-                location: "Vilnius",
-                tag: "Populiarus"
-            },
-            {
-                id: 5,
-                title: "Startuolių pitch konkursas",
-                category: "Verslas",
-                image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=400",
-                date: "Gruodžio 22",
-                location: "Kaunas",
-                tag: "Naujas"
-            },
-            {
-                id: 6,
-                title: "Naujųjų metų sutiktuvės",
-                category: "Pramogos",
-                image: "https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=400",
-                date: "Gruodžio 31",
-                location: "Vilnius",
-                tag: "Rekomenduojama"
-            }
-        ];
-
-        const eventDates = [7, 15, 18, 20, 22, 24, 31];
-        let currentMonth = 11; // December (0-indexed)
-        let currentYear = 2024;
-
-        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            loadUserData();
-            renderFavorites();
-            renderRecommendations();
-            renderCalendar();
-            renderUpcomingEvents();
+            enforceSession();
+            loadPanelData();
         });
 
-        function loadUserData() {
-            const user = localStorage.getItem('currentUser');
-            if (user) {
-                const userData = JSON.parse(user);
-                document.getElementById('userName').textContent = userData.name?.split(' ')[0] || 'Vartotojas';
+        function enforceSession() {
+            const user = getStoredUser();
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
             }
+
+            attenderState.user = user;
+            document.getElementById('userName').textContent = user.name?.split(' ')[0] || 'Vartotojas';
+            document.body.dataset.page = 'user-panel';
+            renderAuthActions();
+        }
+
+        async function loadPanelData() {
+            if (!attenderState.user) return;
+
+            setLoadingState();
+
+            try {
+                const [eventsResult, favoritesResult] = await Promise.all([
+                    window.apiService.getEvents(),
+                    window.apiService.getFavorites(attenderState.user.id),
+                ]);
+
+                const events = eventsResult?.data?.length ? eventsResult.data : getKnownEvents();
+                attenderState.events = events || [];
+
+                attenderState.favorites = favoritesResult?.data || [];
+                attenderState.favoriteIds = new Set(attenderState.favorites.map(f => Number(f.event_id ?? f.id)));
+
+                renderFavorites();
+                renderRecommendations();
+                renderCalendar();
+                renderUpcomingEvents();
+            } catch (error) {
+                console.error('Nepavyko užkrauti duomenų', error);
+                showErrorState('Nepavyko užkrauti duomenų. Bandykite dar kartą.');
+            }
+        }
+
+        function setLoadingState() {
+            const favoritesList = document.getElementById('favoritesList');
+            const recommendationsList = document.getElementById('recommendationsList');
+
+            favoritesList.innerHTML = '<div class="loading">Įkeliama...</div>';
+            recommendationsList.innerHTML = '<div class="loading">Įkeliama...</div>';
+        }
+
+        function showErrorState(message) {
+            const favoritesList = document.getElementById('favoritesList');
+            const recommendationsList = document.getElementById('recommendationsList');
+
+            favoritesList.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>${message}</h3></div>`;
+            recommendationsList.innerHTML = '<div class="empty-state"><p>Rekomendacijų nepavyko užkrauti.</p></div>';
         }
 
         function renderFavorites() {
             const container = document.getElementById('favoritesList');
-            document.getElementById('favoritesCount').textContent = `${favoriteEvents.length} renginiai`;
+            document.getElementById('favoritesCount').textContent = `${attenderState.favorites.length} renginiai`;
 
-            if (favoriteEvents.length === 0) {
+            if (!attenderState.favorites.length) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">💔</div>
@@ -269,24 +255,19 @@
                 return;
             }
 
-            container.innerHTML = favoriteEvents.map(event => `
+            container.innerHTML = attenderState.favorites.map(event => `
                 <div class="event-card" onclick="viewEvent(${event.id})">
-                    <img src="${event.image}" alt="${event.title}" class="event-card-image">
+                    <img src="${event.cover_image || event.image || fallbackImage}" alt="${event.title}" class="event-card-image">
                     <div class="event-card-content">
-                        <span class="event-card-category">${event.category}</span>
+                        <span class="event-card-category">${event.category || 'Renginys'}</span>
                         <h3 class="event-card-title">${event.title}</h3>
                         <div class="event-card-info">
-                            <span>📅 ${event.displayDate}</span>
-                            <span>📍 ${event.location}</span>
+                            <span>📅 ${formatEventDate(event.event_date)}</span>
+                            <span>📍 ${event.location || 'Vieta neapibrėžta'}</span>
                         </div>
                     </div>
                     <div class="event-card-actions">
-                        <button class="btn-icon ${event.notifications ? 'active' : ''}" onclick="toggleNotification(event, ${event.id})" title="${event.notifications ? 'Pranešimai įjungti' : 'Įjungti pranešimus'}">
-                            ${event.notifications ? '🔔' : '🔕'}
-                        </button>
-                        <button class="btn-icon" onclick="removeFavorite(event, ${event.id})" title="Pašalinti iš pamėgtų">
-                            ❤️
-                        </button>
+                        <button class="btn-icon favorite-toggle active" onclick="toggleFavorite(event, ${event.id})" title="Pašalinti iš pamėgtų">❤️</button>
                     </div>
                 </div>
             `).join('');
@@ -294,16 +275,33 @@
 
         function renderRecommendations() {
             const container = document.getElementById('recommendationsList');
-            
-            container.innerHTML = recommendedEvents.map(event => `
-                <div class="recommendation-card" onclick="viewEvent(${event.id})">
-                    <img src="${event.image}" alt="${event.title}" class="recommendation-image">
+            const upcoming = (attenderState.events || []).filter(event => {
+                if (!event.event_date) return false;
+                const eventDate = new Date(event.event_date);
+                return eventDate >= new Date();
+            });
+
+            const recommendations = upcoming
+                .filter(event => !attenderState.favoriteIds.has(Number(event.id)))
+                .slice(0, 6);
+
+            if (!recommendations.length) {
+                container.innerHTML = '<div class="empty-state"><p>Nėra rekomendacijų. Pamėginkite naršyti renginius.</p></div>';
+                return;
+            }
+
+            container.innerHTML = recommendations.map(event => `
+                <div class="recommendation-card">
+                    <img src="${event.cover_image || event.image || fallbackImage}" alt="${event.title}" class="recommendation-image" onclick="viewEvent(${event.id})">
                     <div class="recommendation-body">
-                        <span class="recommendation-tag">${event.tag}</span>
-                        <h3 class="recommendation-title">${event.title}</h3>
-                        <div class="recommendation-info">
-                            <span>📅 ${event.date}</span> • <span>📍 ${event.location}</span>
+                        <span class="recommendation-tag">${event.category || 'Renginys'}</span>
+                        <h3 class="recommendation-title" onclick="viewEvent(${event.id})">${event.title}</h3>
+                        <div class="recommendation-info" onclick="viewEvent(${event.id})">
+                            <span>📅 ${formatEventDate(event.event_date)}</span> • <span>📍 ${event.location || 'Nežinoma vieta'}</span>
                         </div>
+                    </div>
+                    <div class="recommendation-actions">
+                        <button class="btn-icon favorite-toggle ${attenderState.favoriteIds.has(Number(event.id)) ? 'active' : ''}" onclick="toggleFavorite(event, ${event.id})" aria-label="Pamėgti renginį">❤️</button>
                     </div>
                 </div>
             `).join('');
@@ -311,102 +309,136 @@
 
         function renderCalendar() {
             const container = document.getElementById('calendarDays');
-            const monthNames = ['Sausis', 'Vasaris', 'Kovas', 'Balandis', 'Gegužė', 'Birželis', 
+            const monthNames = ['Sausis', 'Vasaris', 'Kovas', 'Balandis', 'Gegužė', 'Birželis',
                                'Liepa', 'Rugpjūtis', 'Rugsėjis', 'Spalis', 'Lapkritis', 'Gruodis'];
-            
-            document.getElementById('calendarMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
-            
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            document.getElementById('calendarMonth').textContent = `${monthNames[attenderState.currentMonth]} ${attenderState.currentYear}`;
+
+            const firstDay = new Date(attenderState.currentYear, attenderState.currentMonth, 1).getDay();
+            const daysInMonth = new Date(attenderState.currentYear, attenderState.currentMonth + 1, 0).getDate();
             const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1;
-            
+
             const today = new Date();
-            const isCurrentMonth = today.getMonth() === currentMonth && today.getFullYear() === currentYear;
-            
+            const isCurrentMonth = today.getMonth() === attenderState.currentMonth && today.getFullYear() === attenderState.currentYear;
+
+            const eventDates = getEventDatesForMonth(attenderState.currentMonth, attenderState.currentYear);
+
             let html = '';
-            
-            // Previous month days
-            const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
+
+            const prevMonthDays = new Date(attenderState.currentYear, attenderState.currentMonth, 0).getDate();
             for (let i = adjustedFirstDay - 1; i >= 0; i--) {
                 html += `<div class="calendar-day other-month">${prevMonthDays - i}</div>`;
             }
-            
-            // Current month days
+
             for (let day = 1; day <= daysInMonth; day++) {
                 const isToday = isCurrentMonth && day === today.getDate();
                 const hasEvent = eventDates.includes(day);
                 let classes = 'calendar-day';
                 if (isToday) classes += ' today';
                 if (hasEvent) classes += ' has-event';
-                html += `<div class="${classes}" onclick="selectDay(${day})">${day}</div>`;
+                html += `<div class="${classes}">${day}</div>`;
             }
-            
-            // Next month days
+
             const totalCells = adjustedFirstDay + daysInMonth;
             const remaining = 42 - totalCells;
             for (let i = 1; i <= remaining && totalCells + i <= 42; i++) {
                 html += `<div class="calendar-day other-month">${i}</div>`;
             }
-            
+
             container.innerHTML = html;
+        }
+
+        function getEventDatesForMonth(month, year) {
+            return attenderState.events
+                .filter(event => {
+                    if (!event.event_date) return false;
+                    const date = new Date(event.event_date);
+                    return date.getMonth() === month && date.getFullYear() === year;
+                })
+                .map(event => new Date(event.event_date).getDate());
         }
 
         function renderUpcomingEvents() {
             const container = document.getElementById('upcomingEventsList');
-            const upcoming = favoriteEvents.slice(0, 3);
-            
-            if (upcoming.length === 0) {
+            const now = new Date();
+            const upcoming = attenderState.favorites
+                .filter(event => event.event_date && new Date(event.event_date) >= now)
+                .sort((a, b) => new Date(a.event_date) - new Date(b.event_date))
+                .slice(0, 5);
+
+            if (!upcoming.length) {
                 container.innerHTML = '<p style="color: hsl(var(--muted-foreground));">Nėra artimų renginių</p>';
                 return;
             }
-            
+
             container.innerHTML = upcoming.map(event => `
                 <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid hsl(var(--border) / 0.5);">
                     <span style="color: hsl(var(--accent));">•</span>
                     <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${event.title}</span>
-                    <span style="color: hsl(var(--muted-foreground)); font-size: 0.8rem;">${event.date.split('-')[2]}d.</span>
+                    <span style="color: hsl(var(--muted-foreground)); font-size: 0.8rem;">${formatEventDate(event.event_date)}</span>
                 </div>
             `).join('');
         }
 
+        function formatEventDate(dateString) {
+            if (!dateString) return 'Data nepateikta';
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return 'Data nepateikta';
+            return date.toLocaleDateString('lt-LT', {
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+            });
+        }
+
+        async function toggleFavorite(e, eventId) {
+            e.stopPropagation();
+
+            if (!attenderState.user) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const response = await window.apiService.toggleFavorite({
+                    event_id: eventId,
+                    user_id: attenderState.user.id,
+                });
+
+                if (response.removed) {
+                    attenderState.favorites = attenderState.favorites.filter(f => Number(f.event_id ?? f.id) !== Number(eventId));
+                } else if (response.favorite) {
+                    attenderState.favorites.unshift(response.favorite);
+                }
+
+                attenderState.favoriteIds = new Set(attenderState.favorites.map(f => Number(f.event_id ?? f.id)));
+                renderFavorites();
+                renderRecommendations();
+                renderCalendar();
+                renderUpcomingEvents();
+            } catch (error) {
+                console.error('Nepavyko atnaujinti pamėgtų', error);
+                alert('Nepavyko atnaujinti pamėgtų renginių.');
+            }
+        }
+
         function prevMonth() {
-            currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
+            attenderState.currentMonth--;
+            if (attenderState.currentMonth < 0) {
+                attenderState.currentMonth = 11;
+                attenderState.currentYear--;
             }
             renderCalendar();
         }
 
         function nextMonth() {
-            currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
+            attenderState.currentMonth++;
+            if (attenderState.currentMonth > 11) {
+                attenderState.currentMonth = 0;
+                attenderState.currentYear++;
             }
             renderCalendar();
-        }
-
-        function selectDay(day) {
-            console.log('Selected day:', day);
-        }
-
-        function toggleNotification(e, eventId) {
-            e.stopPropagation();
-            const event = favoriteEvents.find(ev => ev.id === eventId);
-            if (event) {
-                event.notifications = !event.notifications;
-                renderFavorites();
-            }
-        }
-
-        function removeFavorite(e, eventId) {
-            e.stopPropagation();
-            const index = favoriteEvents.findIndex(ev => ev.id === eventId);
-            if (index > -1) {
-                favoriteEvents.splice(index, 1);
-                renderFavorites();
-            }
         }
 
         function viewEvent(eventId) {
@@ -417,20 +449,17 @@
         function openProfileModal() {
             const modal = document.getElementById('profileModal');
             modal.classList.add('active');
-            
-            const user = localStorage.getItem('currentUser');
-            if (user) {
-                const userData = JSON.parse(user);
-                document.getElementById('inputName').value = userData.name || '';
-                document.getElementById('inputEmail').value = userData.email || '';
-                document.getElementById('inputPhone').value = userData.phone || '';
-                document.getElementById('inputCity').value = userData.city || userData.location || '';
-                
-                const initials = (userData.name || 'VU').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-                document.getElementById('modalAvatar').textContent = initials;
-                document.getElementById('modalUserName').textContent = userData.name || 'Vartotojas';
-                document.getElementById('modalUserType').textContent = userData.type === 'organizer' ? 'Organizatorius' : 'Lankytojas';
-            }
+
+            const userData = attenderState.user || {};
+            document.getElementById('inputName').value = userData.name || '';
+            document.getElementById('inputEmail').value = userData.email || '';
+            document.getElementById('inputPhone').value = userData.phone || '';
+            document.getElementById('inputCity').value = userData.city || userData.location || '';
+
+            const initials = (userData.name || 'VU').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            document.getElementById('modalAvatar').textContent = initials;
+            document.getElementById('modalUserName').textContent = userData.name || 'Vartotojas';
+            document.getElementById('modalUserType').textContent = userData.role === 'organizer' ? 'Organizatorius' : 'Lankytojas';
         }
 
         function closeProfileModal() {
@@ -439,35 +468,30 @@
 
         function saveProfile(e) {
             e.preventDefault();
-            
-            const userData = {
+
+            const updatedUser = {
+                ...attenderState.user,
                 name: document.getElementById('inputName').value,
                 email: document.getElementById('inputEmail').value,
                 phone: document.getElementById('inputPhone').value,
                 city: document.getElementById('inputCity').value,
-                type: 'visitor'
             };
-            
-            localStorage.setItem('currentUser', JSON.stringify(userData));
+
+            saveUser(updatedUser);
+            attenderState.user = updatedUser;
+            document.getElementById('userName').textContent = updatedUser.name?.split(' ')[0] || 'Vartotojas';
             closeProfileModal();
-            loadUserData();
-            
+
             const toast = document.getElementById('successToast');
             toast.classList.add('active');
             setTimeout(() => toast.classList.remove('active'), 3000);
         }
 
-        // Close modal on overlay click
         document.getElementById('profileModal').addEventListener('click', (e) => {
             if (e.target.id === 'profileModal') {
                 closeProfileModal();
             }
         });
-
-        function logout() {
-            localStorage.removeItem('currentUser');
-            window.location.href = '/';
-        }
     </script>
 </body>
 </html>

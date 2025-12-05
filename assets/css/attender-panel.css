@@ -271,6 +271,7 @@
     overflow: hidden;
     transition: all 0.3s;
     cursor: pointer;
+    position: relative;
 }
 
 .recommendation-card:hover {
@@ -308,6 +309,12 @@
 .recommendation-info {
     font-size: 0.85rem;
     color: var(--muted-foreground);
+}
+
+.recommendation-actions {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
 }
 
 /* Empty State */

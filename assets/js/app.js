@@ -466,7 +466,6 @@ function renderAuthActions() {
                 <div class="user-role">${roleLabel}</div>
             </div>
         </div>
-        <a class="btn btn-outline" href="attender-panel.html">Mano renginiai</a>
         <a class="btn btn-outline" href="edit-profile.html">Redaguoti profilį</a>
         ${organizerLink}
         ${adminLink}

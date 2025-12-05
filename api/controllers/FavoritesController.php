@@ -14,10 +14,19 @@ function handleFavorites(string $method, array $input): void
         }
 
         $favoriteModel = new Favorite();
+        $existing = $favoriteModel->findByUserAndEvent((int)$input['user_id'], (int)$input['event_id']);
+
+        if ($existing) {
+            $favoriteModel->deleteByUserAndEvent((int)$input['user_id'], (int)$input['event_id']);
+            respond(['removed' => true]);
+            return;
+        }
+
         $favorite = $favoriteModel->create($input);
 
         if ($favorite) {
-            respond(['favorite' => $favorite], 201);
+            $withEvent = $favoriteModel->findWithEvent((int)$favorite['id']);
+            respond(['favorite' => $withEvent ?: $favorite], 201);
             return;
         }
 
