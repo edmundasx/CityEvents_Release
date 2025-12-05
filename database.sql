@@ -54,6 +54,31 @@ CREATE TABLE favorites (
 CREATE INDEX idx_favorites_user ON favorites (user_id);
 CREATE INDEX idx_favorites_event ON favorites (event_id);
 
+-- User-defined notification settings for specific events
+CREATE TABLE notification_settings (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    event_id BIGINT UNSIGNED NOT NULL,
+    time_offset VARCHAR(10) NOT NULL, -- e.g., '5m', '30m', '1h', '1d'
+    channels JSON NOT NULL, -- e.g., '["sms", "email"]'
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_notification_settings_user FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT fk_notification_settings_event FOREIGN KEY (event_id) REFERENCES events(id),
+    UNIQUE KEY uq_user_event (user_id, event_id)
+);
+
+-- Notifications for users
+CREATE TABLE notifications (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    message TEXT NOT NULL,
+    type ENUM('user', 'organizer', 'admin') NOT NULL DEFAULT 'user',
+    is_read TINYINT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_notifications_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
+CREATE INDEX idx_notifications_user ON notifications (user_id);
+
 -- Blocked users
 CREATE TABLE blocked_users (
     user_id BIGINT UNSIGNED PRIMARY KEY,

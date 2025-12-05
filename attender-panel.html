@@ -5,43 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mano Paskyra - CityEvents</title>
     
-
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/attender-panel.css">
     <link rel="stylesheet" href="assets/css/navbar.css">
+    <link rel="stylesheet" href="assets/css/notification-modal.css">
 </head>
-<body>
+<body data-page="user-panel">
     <header class="header">
         <div class="header-content">
             <div class="header-left">
                 <a href="index.html" class="logo">CityEvents</a>
                 <nav class="nav">
-                    <!-- Renginiai (Events): Core functionality – scrolls to events section on same page -->
-                    <a href="#events" class="nav-link" title="Renginiai – pagrindinė renginių peržiūra">
-                        Renginiai
-                    </a>
-
-                    <!-- Žemėlapis (Map): Visual exploration – opens city map page -->
-                    <a href="city-map.html" class="nav-link" title="Žemėlapis – vizualus renginių žemėlapis">
-                        Žemėlapis
-                    </a>
-
-                    <!-- Organizatoriams (For Organizers): Attract event hosts -->
-                    <a href="for-organizers.html" class="nav-link" title="Organizatoriams – informacija renginių organizatoriams">
-                        Organizatoriams
-                    </a>
-
-                    <!-- Pagalba (Help): FAQ access -->
-                    <a href="help-center.html" class="nav-link" title="Pagalba – DUK ir pagalbos centras">
-                        Pagalba
-                    </a>
+                    <a href="index.html#events" class="nav-link" title="Renginiai – pagrindinė renginių peržiūra">Renginiai</a>
+                    <a href="city-map.html" class="nav-link" title="Žemėlapis – vizualus renginių žemėlapis">Žemėlapis</a>
+                    <a href="for-organizers.html" class="nav-link" title="Organizatoriams – informacija renginių organizatoriams">Organizatoriams</a>
+                    <a href="help-center.html" class="nav-link" title="Pagalba – DUK ir pagalbos centras">Pagalba</a>
                 </nav>
             </div>
             <div class="header-right">
-                <div class="header-actions" id="authActions">
-                    <a class="btn btn-outline js-login-trigger" href="#login">Prisijungti</a>
-                    <a class="btn btn-primary js-signup-trigger" href="#signup">Registruotis</a>
-                </div>
+                <div class="header-actions" id="authActions"></div>
             </div>
         </div>
     </header>
@@ -49,10 +31,10 @@
     <div class="container">
         <div class="page-header">
             <div class="page-header-text">
-                <h1>Sveiki, <span id="userName">Vartotojas</span>! 👋</h1>
+                <h1 id="userGreeting">Sveiki, Vartotojas! 👋</h1>
                 <p>Valdykite savo pamėgtus renginius ir peržiūrėkite rekomendacijas</p>
             </div>
-            <button class="btn btn-accent" onclick="openProfileModal()">✏️ Redaguoti mano profilį</button>
+            <a href="edit-profile.html" class="btn btn-accent">✏️ Redaguoti mano profilį</a>
         </div>
 
         <div class="dashboard-grid">
@@ -62,9 +44,8 @@
                 <div class="section">
                     <div class="section-header">
                         <h2 class="section-title">❤️ Pamėgti renginiai</h2>
-                        <span class="section-badge" id="favoritesCount">0 renginiai</span>
                     </div>
-                    <div class="event-list" id="favoritesList">
+                    <div class="event-list" id="likedEvents">
                         <!-- Populated by JS -->
                     </div>
                 </div>
@@ -90,7 +71,7 @@
                     </div>
                     <div class="calendar-header-nav">
                         <button class="calendar-nav-btn" onclick="prevMonth()">◀</button>
-                        <span class="calendar-month" id="calendarMonth">Gruodis 2024</span>
+                        <span class="calendar-month" id="calendarMonth">Gruodis 2025</span>
                         <button class="calendar-nav-btn" onclick="nextMonth()">▶</button>
                     </div>
                     <div class="calendar-grid" id="calendarDayHeaders">
@@ -102,396 +83,71 @@
                         <div class="calendar-day-header">Št</div>
                         <div class="calendar-day-header">Sk</div>
                     </div>
-                    <div class="calendar-grid" id="calendarDays">
-                        <!-- Populated by JS -->
-                    </div>
+                    <div class="calendar-grid" id="calendarDays"></div>
                     <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid hsl(var(--border));">
                         <p style="font-size: 0.85rem; color: hsl(var(--muted-foreground)); margin-bottom: 0.5rem;">Artimiausi renginiai:</p>
-                        <div id="upcomingEventsList" style="font-size: 0.9rem;">
-                            <!-- Populated by JS -->
-                        </div>
+                        <div id="upcomingEventsList" style="font-size: 0.9rem;"></div>
+                    </div>
+                </div>
+                <!-- Notifications Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">🔔 Pranešimai</h2>
+                    </div>
+                    <div id="userNotifications">
+                        <!-- Populated by JS -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Profile Edit Modal -->
-    <div class="modal-overlay" id="profileModal">
+    <!-- Notification Settings Modal -->
+    <div class="modal-overlay" id="notificationModal">
         <div class="modal">
             <div class="modal-header">
-                <h2 class="modal-title">Redaguoti profilį</h2>
-                <button class="modal-close" onclick="closeProfileModal()">✕</button>
+                <button class="close-btn" id="closeNotificationModal">×</button>
+                <div class="modal-header-content">
+                    <div class="modal-icon">🔔</div>
+                    <div class="modal-title-group">
+                        <h2>Renginio priminimas</h2>
+                        <p>Pasirinkite kada ir kaip norite gauti priminimą</p>
+                    </div>
+                </div>
             </div>
-            <form id="profileForm" onsubmit="saveProfile(event)">
-                <div class="modal-body">
-                    <div class="avatar-section">
-                        <div class="avatar" id="modalAvatar">VU</div>
-                        <div class="avatar-info">
-                            <h3 id="modalUserName">Vartotojas</h3>
-                            <p id="modalUserType">Lankytojas</p>
-                        </div>
-                    </div>
-
+            <div class="modal-body">
+                <input type="hidden" id="notificationEventId" value="">
+                <div class="section">
+                    <div class="section-label"><span class="icon">⏰</span>Priminti prieš renginį</div>
                     <div class="form-group">
-                        <label class="form-label">👤 Vardas ir Pavardė</label>
-                        <input type="text" class="form-input" id="inputName" placeholder="Įveskite vardą" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">📧 El. paštas</label>
-                        <input type="email" class="form-input" id="inputEmail" placeholder="Įveskite el. paštą" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">📱 Telefonas</label>
-                        <input type="tel" class="form-input" id="inputPhone" placeholder="+370 600 00000">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">📍 Miestas</label>
-                        <input type="text" class="form-input" id="inputCity" placeholder="Vilnius">
+                        <select id="timeOffset" name="time_offset" class="form-input">
+                            <option value="5m">5 minutės prieš</option>
+                            <option value="15m">15 minučių prieš</option>
+                            <option value="30m">30 minučių prieš</option>
+                            <option value="1h" selected>1 valanda prieš</option>
+                            <option value="1d">1 diena prieš</option>
+                        </select>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" onclick="closeProfileModal()">Atšaukti</button>
-                    <button type="submit" class="btn btn-primary">💾 Išsaugoti</button>
+                <div class="section">
+                    <div class="section-label"><span class="icon">📬</span>Pranešimo kanalas</div>
+                    <div class="form-group">
+                        <select id="channel" name="channel" class="form-input">
+                            <option value="mobile">Push pranešimas</option>
+                            <option value="email">El. paštas</option>
+                            <option value="sms">SMS žinutė</option>
+                        </select>
+                    </div>
                 </div>
-            </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelNotification">Atšaukti</button>
+                <button class="btn btn-primary" id="saveNotification"><span>🔔</span>Išsaugoti priminimą</button>
+            </div>
         </div>
-    </div>
-
-    <!-- Success Toast -->
-    <div class="toast" id="successToast">
-        ✅ Profilis sėkmingai atnaujintas!
     </div>
 
     <script src="assets/js/api.js"></script>
     <script src="assets/js/app.js"></script>
-    <script>
-        const attenderState = {
-            user: null,
-            favorites: [],
-            favoriteIds: new Set(),
-            events: [],
-            currentMonth: new Date().getMonth(),
-            currentYear: new Date().getFullYear(),
-        };
-        const fallbackImage = 'https://via.placeholder.com/400x250?text=CityEvents';
-
-        document.addEventListener('DOMContentLoaded', () => {
-            enforceSession();
-            loadPanelData();
-        });
-
-        function enforceSession() {
-            const user = getStoredUser();
-            if (!user) {
-                window.location.href = 'index.html';
-                return;
-            }
-
-            attenderState.user = user;
-            document.getElementById('userName').textContent = user.name?.split(' ')[0] || 'Vartotojas';
-            document.body.dataset.page = 'user-panel';
-            renderAuthActions();
-        }
-
-        async function loadPanelData() {
-            if (!attenderState.user) return;
-
-            setLoadingState();
-
-            try {
-                const [eventsResult, favoritesResult] = await Promise.all([
-                    window.apiService.getEvents(),
-                    window.apiService.getFavorites(attenderState.user.id),
-                ]);
-
-                const events = eventsResult?.data?.length ? eventsResult.data : getKnownEvents();
-                attenderState.events = events || [];
-
-                attenderState.favorites = favoritesResult?.data || [];
-                attenderState.favoriteIds = new Set(attenderState.favorites.map(f => Number(f.event_id ?? f.id)));
-
-                renderFavorites();
-                renderRecommendations();
-                renderCalendar();
-                renderUpcomingEvents();
-            } catch (error) {
-                console.error('Nepavyko užkrauti duomenų', error);
-                showErrorState('Nepavyko užkrauti duomenų. Bandykite dar kartą.');
-            }
-        }
-
-        function setLoadingState() {
-            const favoritesList = document.getElementById('favoritesList');
-            const recommendationsList = document.getElementById('recommendationsList');
-
-            favoritesList.innerHTML = '<div class="loading">Įkeliama...</div>';
-            recommendationsList.innerHTML = '<div class="loading">Įkeliama...</div>';
-        }
-
-        function showErrorState(message) {
-            const favoritesList = document.getElementById('favoritesList');
-            const recommendationsList = document.getElementById('recommendationsList');
-
-            favoritesList.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>${message}</h3></div>`;
-            recommendationsList.innerHTML = '<div class="empty-state"><p>Rekomendacijų nepavyko užkrauti.</p></div>';
-        }
-
-        function renderFavorites() {
-            const container = document.getElementById('favoritesList');
-            document.getElementById('favoritesCount').textContent = `${attenderState.favorites.length} renginiai`;
-
-            if (!attenderState.favorites.length) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">💔</div>
-                        <h3>Nėra pamėgtų renginių</h3>
-                        <p>Pradėkite naršyti ir pažymėkite patinkančius renginius!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = attenderState.favorites.map(event => `
-                <div class="event-card" onclick="viewEvent(${event.id})">
-                    <img src="${event.cover_image || event.image || fallbackImage}" alt="${event.title}" class="event-card-image">
-                    <div class="event-card-content">
-                        <span class="event-card-category">${event.category || 'Renginys'}</span>
-                        <h3 class="event-card-title">${event.title}</h3>
-                        <div class="event-card-info">
-                            <span>📅 ${formatEventDate(event.event_date)}</span>
-                            <span>📍 ${event.location || 'Vieta neapibrėžta'}</span>
-                        </div>
-                    </div>
-                    <div class="event-card-actions">
-                        <button class="btn-icon favorite-toggle active" onclick="toggleFavorite(event, ${event.id})" title="Pašalinti iš pamėgtų">❤️</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderRecommendations() {
-            const container = document.getElementById('recommendationsList');
-            const upcoming = (attenderState.events || []).filter(event => {
-                if (!event.event_date) return false;
-                const eventDate = new Date(event.event_date);
-                return eventDate >= new Date();
-            });
-
-            const recommendations = upcoming
-                .filter(event => !attenderState.favoriteIds.has(Number(event.id)))
-                .slice(0, 6);
-
-            if (!recommendations.length) {
-                container.innerHTML = '<div class="empty-state"><p>Nėra rekomendacijų. Pamėginkite naršyti renginius.</p></div>';
-                return;
-            }
-
-            container.innerHTML = recommendations.map(event => `
-                <div class="recommendation-card">
-                    <img src="${event.cover_image || event.image || fallbackImage}" alt="${event.title}" class="recommendation-image" onclick="viewEvent(${event.id})">
-                    <div class="recommendation-body">
-                        <span class="recommendation-tag">${event.category || 'Renginys'}</span>
-                        <h3 class="recommendation-title" onclick="viewEvent(${event.id})">${event.title}</h3>
-                        <div class="recommendation-info" onclick="viewEvent(${event.id})">
-                            <span>📅 ${formatEventDate(event.event_date)}</span> • <span>📍 ${event.location || 'Nežinoma vieta'}</span>
-                        </div>
-                    </div>
-                    <div class="recommendation-actions">
-                        <button class="btn-icon favorite-toggle ${attenderState.favoriteIds.has(Number(event.id)) ? 'active' : ''}" onclick="toggleFavorite(event, ${event.id})" aria-label="Pamėgti renginį">❤️</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderCalendar() {
-            const container = document.getElementById('calendarDays');
-            const monthNames = ['Sausis', 'Vasaris', 'Kovas', 'Balandis', 'Gegužė', 'Birželis',
-                               'Liepa', 'Rugpjūtis', 'Rugsėjis', 'Spalis', 'Lapkritis', 'Gruodis'];
-
-            document.getElementById('calendarMonth').textContent = `${monthNames[attenderState.currentMonth]} ${attenderState.currentYear}`;
-
-            const firstDay = new Date(attenderState.currentYear, attenderState.currentMonth, 1).getDay();
-            const daysInMonth = new Date(attenderState.currentYear, attenderState.currentMonth + 1, 0).getDate();
-            const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1;
-
-            const today = new Date();
-            const isCurrentMonth = today.getMonth() === attenderState.currentMonth && today.getFullYear() === attenderState.currentYear;
-
-            const eventDates = getEventDatesForMonth(attenderState.currentMonth, attenderState.currentYear);
-
-            let html = '';
-
-            const prevMonthDays = new Date(attenderState.currentYear, attenderState.currentMonth, 0).getDate();
-            for (let i = adjustedFirstDay - 1; i >= 0; i--) {
-                html += `<div class="calendar-day other-month">${prevMonthDays - i}</div>`;
-            }
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const isToday = isCurrentMonth && day === today.getDate();
-                const hasEvent = eventDates.includes(day);
-                let classes = 'calendar-day';
-                if (isToday) classes += ' today';
-                if (hasEvent) classes += ' has-event';
-                html += `<div class="${classes}">${day}</div>`;
-            }
-
-            const totalCells = adjustedFirstDay + daysInMonth;
-            const remaining = 42 - totalCells;
-            for (let i = 1; i <= remaining && totalCells + i <= 42; i++) {
-                html += `<div class="calendar-day other-month">${i}</div>`;
-            }
-
-            container.innerHTML = html;
-        }
-
-        function getEventDatesForMonth(month, year) {
-            return attenderState.events
-                .filter(event => {
-                    if (!event.event_date) return false;
-                    const date = new Date(event.event_date);
-                    return date.getMonth() === month && date.getFullYear() === year;
-                })
-                .map(event => new Date(event.event_date).getDate());
-        }
-
-        function renderUpcomingEvents() {
-            const container = document.getElementById('upcomingEventsList');
-            const now = new Date();
-            const upcoming = attenderState.favorites
-                .filter(event => event.event_date && new Date(event.event_date) >= now)
-                .sort((a, b) => new Date(a.event_date) - new Date(b.event_date))
-                .slice(0, 5);
-
-            if (!upcoming.length) {
-                container.innerHTML = '<p style="color: hsl(var(--muted-foreground));">Nėra artimų renginių</p>';
-                return;
-            }
-
-            container.innerHTML = upcoming.map(event => `
-                <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid hsl(var(--border) / 0.5);">
-                    <span style="color: hsl(var(--accent));">•</span>
-                    <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${event.title}</span>
-                    <span style="color: hsl(var(--muted-foreground)); font-size: 0.8rem;">${formatEventDate(event.event_date)}</span>
-                </div>
-            `).join('');
-        }
-
-        function formatEventDate(dateString) {
-            if (!dateString) return 'Data nepateikta';
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) return 'Data nepateikta';
-            return date.toLocaleDateString('lt-LT', {
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-            });
-        }
-
-        async function toggleFavorite(e, eventId) {
-            e.stopPropagation();
-
-            if (!attenderState.user) {
-                window.location.href = 'index.html';
-                return;
-            }
-
-            try {
-                const response = await window.apiService.toggleFavorite({
-                    event_id: eventId,
-                    user_id: attenderState.user.id,
-                });
-
-                if (response.removed) {
-                    attenderState.favorites = attenderState.favorites.filter(f => Number(f.event_id ?? f.id) !== Number(eventId));
-                } else if (response.favorite) {
-                    attenderState.favorites.unshift(response.favorite);
-                }
-
-                attenderState.favoriteIds = new Set(attenderState.favorites.map(f => Number(f.event_id ?? f.id)));
-                renderFavorites();
-                renderRecommendations();
-                renderCalendar();
-                renderUpcomingEvents();
-            } catch (error) {
-                console.error('Nepavyko atnaujinti pamėgtų', error);
-                alert('Nepavyko atnaujinti pamėgtų renginių.');
-            }
-        }
-
-        function prevMonth() {
-            attenderState.currentMonth--;
-            if (attenderState.currentMonth < 0) {
-                attenderState.currentMonth = 11;
-                attenderState.currentYear--;
-            }
-            renderCalendar();
-        }
-
-        function nextMonth() {
-            attenderState.currentMonth++;
-            if (attenderState.currentMonth > 11) {
-                attenderState.currentMonth = 0;
-                attenderState.currentYear++;
-            }
-            renderCalendar();
-        }
-
-        function viewEvent(eventId) {
-            window.location.href = `/event-details.html?id=${eventId}`;
-        }
-
-        // Profile Modal
-        function openProfileModal() {
-            const modal = document.getElementById('profileModal');
-            modal.classList.add('active');
-
-            const userData = attenderState.user || {};
-            document.getElementById('inputName').value = userData.name || '';
-            document.getElementById('inputEmail').value = userData.email || '';
-            document.getElementById('inputPhone').value = userData.phone || '';
-            document.getElementById('inputCity').value = userData.city || userData.location || '';
-
-            const initials = (userData.name || 'VU').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-            document.getElementById('modalAvatar').textContent = initials;
-            document.getElementById('modalUserName').textContent = userData.name || 'Vartotojas';
-            document.getElementById('modalUserType').textContent = userData.role === 'organizer' ? 'Organizatorius' : 'Lankytojas';
-        }
-
-        function closeProfileModal() {
-            document.getElementById('profileModal').classList.remove('active');
-        }
-
-        function saveProfile(e) {
-            e.preventDefault();
-
-            const updatedUser = {
-                ...attenderState.user,
-                name: document.getElementById('inputName').value,
-                email: document.getElementById('inputEmail').value,
-                phone: document.getElementById('inputPhone').value,
-                city: document.getElementById('inputCity').value,
-            };
-
-            saveUser(updatedUser);
-            attenderState.user = updatedUser;
-            document.getElementById('userName').textContent = updatedUser.name?.split(' ')[0] || 'Vartotojas';
-            closeProfileModal();
-
-            const toast = document.getElementById('successToast');
-            toast.classList.add('active');
-            setTimeout(() => toast.classList.remove('active'), 3000);
-        }
-
-        document.getElementById('profileModal').addEventListener('click', (e) => {
-            if (e.target.id === 'profileModal') {
-                closeProfileModal();
-            }
-        });
-    </script>
 </body>
 </html>

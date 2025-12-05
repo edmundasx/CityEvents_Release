@@ -76,9 +76,45 @@ const state = {
     markers: [],
     events: [],
     notifications: [],
-    favorites: [1, 3],
+    favorites: [],
+    notificationSettings: new Map(),
     organizerEventsCache: [],
 };
+
+async function fetchUserFavorites() {
+    const user = getStoredUser();
+    if (!user) {
+        state.favorites = [];
+        return;
+    }
+
+    try {
+        const { favorites } = await fetchJSON(`${API_BASE}?resource=favorites&user_id=${user.id}`);
+        state.favorites = favorites.map(fav => fav.event_id);
+    } catch (error) {
+        console.error("Failed to fetch user favorites:", error);
+        state.favorites = [];
+    }
+}
+
+async function fetchNotificationSettings() {
+    const user = getStoredUser();
+    if (!user) {
+        state.notificationSettings.clear();
+        return;
+    }
+
+    try {
+        const { notification_settings } = await fetchJSON(`${API_BASE}?resource=notification_settings&user_id=${user.id}`);
+        state.notificationSettings.clear();
+        notification_settings.forEach(setting => {
+            state.notificationSettings.set(setting.event_id, setting);
+        });
+    } catch (error) {
+        console.error("Failed to fetch notification settings:", error);
+        state.notificationSettings.clear();
+    }
+}
 
 function getKnownEvents(filters = {}) {
     let events = state.events.length ? state.events : apiClient.getCachedEvents();
@@ -160,6 +196,7 @@ function addOrganizerNotification(event, status, reason = '') {
 const adminCalendarState = {
     currentDate: new Date(),
     events: [],
+    likedEventDates: new Set(),
 };
 
 function getStoredUser() {
@@ -303,6 +340,8 @@ function initLoginModal() {
             });
 
             saveUser(data.user);
+            await fetchUserFavorites();
+            await fetchNotificationSettings();
             message.textContent = `Prisijungta kaip ${data.user.name}`;
             message.style.color = '#15803d';
             form.reset();
@@ -466,6 +505,7 @@ function renderAuthActions() {
                 <div class="user-role">${roleLabel}</div>
             </div>
         </div>
+        <a class="btn btn-outline" href="attender-panel.html">Mano renginiai</a>
         <a class="btn btn-outline" href="edit-profile.html">Redaguoti profilį</a>
         ${organizerLink}
         ${adminLink}
@@ -525,8 +565,9 @@ function syncNavRoleLinks(user) {
     });
 }
 
-function renderEvents(events = []) {
-    const container = document.getElementById('eventsGrid');
+function renderEvents(events = [], options = {}) {
+    const { containerId = 'eventsGrid', showStatus = true, showNotificationButton = false } = options;
+    const container = document.getElementById(containerId);
     if (!container) return;
 
     if (!events.length) {
@@ -536,7 +577,15 @@ function renderEvents(events = []) {
 
     container.innerHTML = events.map(event => {
         const price = event.price && Number(event.price) > 0 ? `${Number(event.price).toFixed(2)} €` : 'Nemokama';
-        const statusClass = event.status ? `status-${event.status}` : 'status-approved';
+        const isFavorite = state.favorites.includes(event.id);
+        const hasNotification = state.notificationSettings.has(event.id);
+        const statusBadge = showStatus ? `<span class="status-badge status-${event.status || 'approved'}">${formatStatus(event.status || 'approved')}</span>` : '';
+        const notificationButton = showNotificationButton
+            ? `<button class="btn-icon notification-toggle ${hasNotification ? 'active' : ''}" data-notification="${event.id}" aria-label="Pranešimai">
+                   ${hasNotification ? '🔔' : '🔕'}
+               </button>`
+            : '';
+
         return `
             <article class="event-card" data-id="${event.id}">
                 <div class="event-card-wrapper">
@@ -546,13 +595,16 @@ function renderEvents(events = []) {
                 <div class="event-content">
                     <div class="event-card-footer">
                         <span class="tag">${event.category || 'Kita'}</span>
-                        <span class="status-badge ${statusClass}">${formatStatus(event.status || 'approved')}</span>
+                        ${statusBadge}
                     </div>
                     <h3 class="event-title">${event.title}</h3>
                     <div class="event-detail">📍 ${event.location}</div>
                     <div class="event-detail">📅 ${new Date(event.event_date).toLocaleString('lt-LT')}</div>
                     <div class="event-card-footer">
-                        <button class="btn-ghost" data-favorite="${event.id}">❤ Įsiminti</button>
+                        <button class="btn-ghost favorite-btn ${isFavorite ? 'active' : ''}" data-favorite="${event.id}">
+                            ${isFavorite ? '❤️ Išsaugota' : '❤ Įsiminti'}
+                        </button>
+                        ${notificationButton}
                         <a class="btn btn-outline" href="event-details.html?id=${event.id}">Daugiau</a>
                     </div>
                 </div>
@@ -563,13 +615,20 @@ function renderEvents(events = []) {
     container.querySelectorAll('[data-favorite]').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            toggleFavorite(btn.dataset.favorite, 'favorite');
+            toggleFavorite(btn.dataset.favorite);
+        });
+    });
+
+    container.querySelectorAll('[data-notification]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleNotificationSetting(btn.dataset.notification);
         });
     });
 
     container.querySelectorAll('.event-card').forEach(card => {
         card.addEventListener('click', (e) => {
-            if (e.target.closest('[data-favorite]') || e.target.tagName === 'A') return;
+            if (e.target.closest('[data-favorite]') || e.target.closest('[data-notification]') || e.target.tagName === 'A') return;
             window.location.href = `event-details.html?id=${card.dataset.id}`;
         });
     });
@@ -740,21 +799,134 @@ async function loadOrganizerEvents() {
     }
 }
 
-async function toggleFavorite(eventId, tag = 'favorite') {
+async function toggleFavorite(eventId) {
     const user = getStoredUser();
     if (!user) {
         promptLogin('Prisijunkite, kad pažymėtumėte renginius.');
         return;
     }
 
+    const eventIdNum = Number(eventId);
+    if (isNaN(eventIdNum)) {
+        console.error("Invalid eventId provided to toggleFavorite:", eventId);
+        return;
+    }
+
+    const isFavorite = state.favorites.includes(eventIdNum);
+
     try {
         await fetchJSON(`${API_BASE}?resource=favorites`, {
             method: 'POST',
-            body: JSON.stringify({ event_id: eventId, user_id: user.id, tag }),
+            body: JSON.stringify({ event_id: eventIdNum, user_id: user.id }),
         });
-        loadRecommendations();
+
+        if (isFavorite) {
+            state.favorites = state.favorites.filter(id => id !== eventIdNum);
+        } else {
+            state.favorites.push(eventIdNum);
+        }
+
+        const buttons = document.querySelectorAll(`[data-favorite="${eventId}"]`);
+        buttons.forEach(button => {
+            const isNowFavorite = state.favorites.includes(eventIdNum);
+            button.innerHTML = isNowFavorite ? '❤️' : '🤍';
+            button.classList.toggle('active', isNowFavorite);
+        });
+
+        if (document.body.dataset.page === 'user-panel') {
+            loadUserDashboard();
+        }
     } catch (err) {
-        console.error(err);
+        console.error("Failed to toggle favorite:", err);
+    }
+}
+
+async function toggleNotificationSetting(eventId) {
+    const user = getStoredUser();
+    if (!user) {
+        promptLogin('Prisijunkite, kad nustatytumėte pranešimus.');
+        return;
+    }
+
+    const eventIdNum = Number(eventId);
+    const hasNotification = state.notificationSettings.has(eventIdNum);
+
+    if (hasNotification) {
+        // Toggle off
+        try {
+            await fetchJSON(`${API_BASE}?resource=notification_settings`, {
+                method: 'POST',
+                body: JSON.stringify({ event_id: eventIdNum, user_id: user.id }),
+            });
+            state.notificationSettings.delete(eventIdNum);
+            updateNotificationIcons(eventIdNum, false);
+            if (document.body.dataset.page === 'user-panel') {
+                loadUserDashboard();
+            }
+        } catch (error) {
+            console.error("Failed to remove notification setting:", error);
+        }
+    } else {
+        // Toggle on - open modal
+        openNotificationModal(eventIdNum);
+    }
+}
+
+function updateNotificationIcons(eventId, isActive) {
+    const buttons = document.querySelectorAll(`[data-notification="${eventId}"]`);
+    buttons.forEach(button => {
+        button.innerHTML = isActive ? '🔔' : '🔕';
+        button.classList.toggle('active', isActive);
+    });
+}
+
+function openNotificationModal(eventId) {
+    const modal = document.getElementById('notificationModal');
+    if (modal) {
+        document.getElementById('notificationEventId').value = eventId;
+        modal.classList.add('active');
+    }
+}
+
+function closeNotificationModal() {
+    const modal = document.getElementById('notificationModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+async function saveNotificationSettings() {
+    const user = getStoredUser();
+    if (!user) return;
+
+    const eventId = Number(document.getElementById('notificationEventId').value);
+    const timeOffset = document.getElementById('timeOffset').value;
+    const channel = document.getElementById('channel').value;
+
+    if (!channel) {
+        alert("Pasirinkite pranešimo kanalą.");
+        return;
+    }
+
+    try {
+        const { setting } = await fetchJSON(`${API_BASE}?resource=notification_settings`, {
+            method: 'POST',
+            body: JSON.stringify({
+                event_id: eventId,
+                user_id: user.id,
+                time_offset: timeOffset,
+                channels: [channel],
+            }),
+        });
+
+        state.notificationSettings.set(eventId, setting);
+        updateNotificationIcons(eventId, true);
+        closeNotificationModal();
+        if (document.body.dataset.page === 'user-panel') {
+            loadUserDashboard();
+        }
+    } catch (error) {
+        console.error("Failed to save notification settings:", error);
     }
 }
 
@@ -777,42 +949,54 @@ function renderNotifications(containerId, filterType) {
     `).join('');
 }
 
+function renderRecommendationCards(events = []) {
+    const container = document.getElementById('recommendationsList');
+    if (!container) return;
+
+    if (!events.length) {
+        container.innerHTML = '<div class="loading">Rekomendacijų kol kas nėra.</div>';
+        return;
+    }
+
+    container.innerHTML = events.map(event => {
+        const isFavorite = state.favorites.includes(event.id);
+        return `
+            <div class="recommendation-card">
+                <img src="${event.cover_image || 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=80'}" alt="${event.title}" class="recommendation-image" onclick="window.location.href='event-details.html?id=${event.id}'">
+                <div class="recommendation-body">
+                    <span class="recommendation-tag">${event.category}</span>
+                    <h3 class="recommendation-title" onclick="window.location.href='event-details.html?id=${event.id}'">${event.title}</h3>
+                    <div class="recommendation-info" onclick="window.location.href='event-details.html?id=${event.id}'">
+                        <span>📅 ${new Date(event.event_date).toLocaleDateString('lt-LT')}</span> • <span>📍 ${event.location}</span>
+                    </div>
+                </div>
+                <div class="recommendation-actions">
+                    <button class="btn-icon favorite-toggle ${isFavorite ? 'active' : ''}" onclick="toggleFavorite(${event.id})" aria-label="Pamėgti renginį">❤️</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
 async function loadRecommendations() {
     const user = getStoredUser();
-    const container = document.getElementById('recommendations');
+    const container = document.getElementById('recommendationsList');
     if (!container) return;
 
     container.innerHTML = '<div class="loading">Kraunama...</div>';
 
     try {
-        const data = await fetchJSON(`${API_BASE}?${buildQuery({ resource: 'recommendations', user_id: user?.id })}`);
-        const list = data.events || [];
-        if (!list.length) {
+        const { events } = await fetchJSON(`${API_BASE}?${buildQuery({ resource: 'recommendations', user_id: user?.id })}`);
+        if (!events || !events.length) {
             container.innerHTML = '<div class="loading">Rekomendacijų kol kas nėra.</div>';
             return;
         }
-        container.innerHTML = list.map(item => `
-            <div class="list-item">
-                <div>
-                    <h4>${item.title}</h4>
-                    <small>${item.location} • ${new Date(item.event_date).toLocaleDateString('lt-LT')}</small>
-                </div>
-                <button class="btn-ghost" onclick="window.location='event-details.html?id=${item.id}'">Atidaryti</button>
-            </div>
-        `).join('');
+        renderRecommendationCards(events);
     } catch (err) {
         console.error(err);
         const known = await ensureEventsLoaded().catch(() => getKnownEvents());
         const list = known.slice(0, 3);
-        container.innerHTML = list.map(item => `
-            <div class="list-item">
-                <div>
-                    <h4>${item.title}</h4>
-                    <small>${item.location} • ${new Date(item.event_date).toLocaleDateString('lt-LT')}</small>
-                </div>
-                <button class="btn-ghost" onclick="window.location='event-details.html?id=${item.id}'">Atidaryti</button>
-            </div>
-        `).join('');
+        renderRecommendationCards(list);
     }
 }
 
@@ -888,7 +1072,7 @@ async function loadEventDetails() {
                 window.open('https://www.tiketa.lt', '_blank', 'noopener');
             };
         }
-        document.getElementById('btnFavorite').onclick = () => toggleFavorite(event.id, 'favorite');
+        document.getElementById('btnFavorite').onclick = () => toggleFavorite(event.id);
     } catch (err) {
         const fallback = getKnownEvents().find(ev => String(ev.id) === String(eventId));
         if (fallback) {
@@ -1170,25 +1354,6 @@ function renderOrganizerBoard(list = [], filter = 'all', sortDirection = 'asc') 
     template(pastContainer, past);
 }
 
-function renderEventCards(containerId, items = []) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    if (!items.length) {
-        container.innerHTML = '<div class="loading">Nėra įrašų.</div>';
-        return;
-    }
-    container.innerHTML = items.map(event => `
-        <article class="mini-card">
-            <div>
-                <p class="eyebrow">${event.category} • ${new Date(event.event_date).toLocaleDateString('lt-LT')}</p>
-                <h4>${event.title}</h4>
-                <p class="muted">${event.location}</p>
-            </div>
-            <span class="status-badge status-${event.status}">${formatStatus(event.status)}</span>
-        </article>
-    `).join('');
-}
-
 async function loadOrganizerEventsBoard() {
     const user = getStoredUser();
     const chips = document.querySelectorAll('.chip');
@@ -1252,20 +1417,32 @@ async function loadOrganizerEventsBoard() {
 }
 
 async function loadUserDashboard() {
-    const user = getStoredUser() || { name: 'Svečias', role: 'user' };
+    const user = getStoredUser();
+    if (!user) {
+        window.location.href = 'index.html';
+        return;
+    }
+
     const header = document.getElementById('userGreeting');
     if (header) {
         header.textContent = `${user.name}, jūsų renginiai ir mėgstamiausi`;
     }
 
-    const events = await ensureEventsLoaded().catch(() => getKnownEvents());
-    const now = new Date();
-    const liked = events.filter(ev => state.favorites.includes(ev.id));
-    const past = events.filter(ev => new Date(ev.event_date) < now);
-    renderEventCards('likedEvents', liked);
-    renderEventCards('pastUserEvents', past);
+    try {
+        const { favorites } = await fetchJSON(`${API_BASE}?resource=favorites&user_id=${user.id}`);
+        renderEvents(favorites, { containerId: 'likedEvents', showStatus: false, showNotificationButton: true });
+    } catch (error) {
+        console.error("Failed to load liked events:", error);
+        const likedEventsContainer = document.getElementById('likedEvents');
+        if (likedEventsContainer) {
+            likedEventsContainer.innerHTML = '<div class="loading">Nepavyko įkelti pamėgtų renginių.</div>';
+        }
+    }
+
+    loadRecommendations();
     await ensureNotificationsLoaded();
     renderNotifications('userNotifications', 'user');
+    renderAdminCalendarGrid(state.events);
 }
 
 function hydrateOrganizerEditForm() {
@@ -1391,7 +1568,7 @@ function renderAdminCalendar(events = []) {
 }
 
 function renderAdminCalendarGrid(events = []) {
-    const grid = document.getElementById('calendarGrid');
+    const grid = document.getElementById('calendarDays');
     const label = document.getElementById('calendarMonth');
     if (!grid || !label) return;
 
@@ -1405,11 +1582,10 @@ function renderAdminCalendarGrid(events = []) {
 
     label.textContent = viewDate.toLocaleDateString('lt-LT', { month: 'long', year: 'numeric' });
 
-    const weekdays = ['Pr', 'An', 'Tr', 'Kt', 'Pn', 'Št', 'Sk'];
-    const cells = weekdays.map(day => `<div class="calendar-weekday">${day}</div>`);
+    const cells = [];
 
     for (let i = 0; i < offset; i += 1) {
-        cells.push('<div class="calendar-cell muted"></div>');
+        cells.push('<div class="calendar-day other-month"></div>');
     }
 
     for (let day = 1; day <= daysInMonth; day += 1) {
@@ -1418,19 +1594,14 @@ function renderAdminCalendarGrid(events = []) {
             return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
         });
 
-        const eventMarkup = dayEvents.map(ev => `
-            <div class="calendar-event ${ev.status}">
-                <strong>${ev.title}</strong>
-                <div class="muted">${new Date(ev.event_date).toLocaleTimeString('lt-LT', { hour: '2-digit', minute: '2-digit' })}</div>
-            </div>
-        `).join('');
+        const hasEvent = dayEvents.length > 0;
+        const isToday = new Date().getFullYear() === year && new Date().getMonth() === month && new Date().getDate() === day;
+        
+        let dayClass = 'calendar-day';
+        if (isToday) dayClass += ' today';
+        if (hasEvent) dayClass += ' has-event';
 
-        cells.push(`
-            <div class="calendar-cell">
-                <div class="day-number">${day}</div>
-                ${eventMarkup || '<span class="muted">–</span>'}
-            </div>
-        `);
+        cells.push(`<div class="${dayClass}">${day}</div>`);
     }
 
     grid.innerHTML = cells.join('');
@@ -1696,7 +1867,7 @@ function initForOrganizersPage() {
     });
 }
 
-function init() {
+async function init() {
     try {
         const page = document.body.dataset.page;
         const isSignupPage = page === 'signup';
@@ -1707,6 +1878,8 @@ function init() {
             initSignupModal();
             bindLoginTriggers();
             bindSignupTriggers();
+            await fetchUserFavorites();
+            await fetchNotificationSettings();
             renderAuthActions();
         }
 
@@ -1728,6 +1901,14 @@ function init() {
                 break;
             case 'user-panel':
                 loadUserDashboard();
+                document.getElementById('saveNotification').addEventListener('click', saveNotificationSettings);
+                document.getElementById('cancelNotification').addEventListener('click', closeNotificationModal);
+                document.getElementById('closeNotificationModal').addEventListener('click', closeNotificationModal);
+                document.querySelectorAll('.channel-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        option.classList.toggle('selected');
+                    });
+                });
                 break;
             case 'organizer-profile':
                 loadOrganizerProfilePage();
