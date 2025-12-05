@@ -2,6 +2,7 @@ const API_BASE = 'api/index.php';
 const CACHE_KEYS = {
     events: 'cityevents_cache_events',
     notifications: 'cityevents_cache_notifications',
+    favorites: 'cityevents_cache_favorites',
 };
 
 function buildQuery(params = {}) {
@@ -73,6 +74,25 @@ function getCachedNotifications() {
 const apiService = {
     getEvents: (params = {}) => fetchWithCache('events', params),
     getNotifications: (params = {}) => fetchWithCache('notifications', params),
+    getFavorites: async (userId) => {
+        if (!userId) return { data: [], error: new Error('Trūksta naudotojo ID') };
+        try {
+            const data = await fetchJSON(`${API_BASE}?${buildQuery({ resource: 'favorites', user_id: userId })}`);
+            return { data: data.favorites || [], error: null };
+        } catch (error) {
+            return { data: [], error };
+        }
+    },
+    toggleFavorite: async (payload) => {
+        if (!payload?.user_id || !payload?.event_id) {
+            throw new Error('Trūksta reikalingų laukų');
+        }
+
+        return fetchJSON(`${API_BASE}?${buildQuery({ resource: 'favorites' })}`, {
+            method: 'POST',
+            body: JSON.stringify(payload),
+        });
+    },
     getCachedEvents,
     getCachedNotifications,
 };
