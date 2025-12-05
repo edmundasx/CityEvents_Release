@@ -1,5 +1,18 @@
 const USER_STORAGE_KEY = 'cityevents_user';
 
+function parseStoredJSON(key, fallback = null) {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+
+    try {
+        return JSON.parse(raw);
+    } catch (err) {
+        console.warn('Removing corrupted value from storage for key', key, err);
+        localStorage.removeItem(key);
+        return fallback;
+    }
+}
+
 const state = {
     map: null,
     markers: [],
@@ -91,8 +104,16 @@ const adminCalendarState = {
 };
 
 function getStoredUser() {
-    const saved = localStorage.getItem(USER_STORAGE_KEY);
-    return saved ? JSON.parse(saved) : null;
+    const user = parseStoredJSON(USER_STORAGE_KEY);
+    if (!user || typeof user !== 'object') return null;
+
+    if (!user.id || !user.role) {
+        console.warn('Removing incomplete user profile from storage');
+        localStorage.removeItem(USER_STORAGE_KEY);
+        return null;
+    }
+
+    return user;
 }
 
 function ensureAuthContainer() {
@@ -138,6 +159,11 @@ function promptLogin(message = '') {
 }
 
 function saveUser(user) {
+    if (!user || typeof user !== 'object') {
+        console.warn('Attempted to store an invalid user object', user);
+        return;
+    }
+
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
 }
 
