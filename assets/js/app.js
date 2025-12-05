@@ -1,104 +1,4 @@
 const USER_STORAGE_KEY = 'cityevents_user';
-const LOCAL_EVENTS_KEY = 'cityevents_events';
-
-const FALLBACK_EVENTS = [
-    {
-        id: 1,
-        organizer_id: 2,
-        organizer_name: 'Organizer',
-        title: 'Miesto mugė',
-        description: 'Sezoninė miesto mugė su vietiniais gamintojais ir scena',
-        category: 'food',
-        location: 'Rotušės aikštė',
-        lat: 54.6872,
-        lng: 25.2797,
-        event_date: new Date(Date.now() + 7 * 86400000).toISOString(),
-        price: 0,
-        status: 'approved',
-        cover_image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-        id: 2,
-        organizer_id: 2,
-        organizer_name: 'Organizer',
-        title: 'Technologijų vakaras',
-        description: 'Diskusijos ir dirbtuvės apie inovacijas',
-        category: 'business',
-        location: 'Technopolis Vilnius',
-        lat: 54.6690,
-        lng: 25.2747,
-        event_date: new Date(Date.now() + 14 * 86400000).toISOString(),
-        price: 15,
-        status: 'pending',
-        cover_image: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=900&q=80',
-    },
-    {
-        id: 3,
-        organizer_id: 2,
-        organizer_name: 'Organizer',
-        title: 'Muzikos piknikas',
-        description: 'Gyva muzika parke ir maisto furgonai',
-        category: 'music',
-        location: 'Bernardinų sodas',
-        lat: 54.6840,
-        lng: 25.2900,
-        event_date: new Date(Date.now() + 3 * 86400000).toISOString(),
-        price: 5,
-        status: 'approved',
-        cover_image: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=900&q=80',
-    },
-    {
-        id: 4,
-        organizer_id: 2,
-        organizer_name: 'Organizer',
-        title: 'Urban Run',
-        description: '5 km miesto bėgimas palei upę su muzika finiše',
-        category: 'sports',
-        location: 'Neries pakrantė',
-        lat: 54.6890,
-        lng: 25.2660,
-        event_date: new Date(Date.now() - 10 * 86400000).toISOString(),
-        price: 0,
-        status: 'approved',
-        cover_image: 'https://images.unsplash.com/photo-1508609349937-5ec4ae374ebf?auto=format&fit=crop&w=900&q=80',
-    },
-    {
-        id: 5,
-        organizer_id: 2,
-        organizer_name: 'Organizer',
-        title: 'Kino vakaras po atviru dangumi',
-        description: 'Vasaros kino seansas su vietos režisieriumi',
-        category: 'arts',
-        location: 'Valdovų rūmų kiemas',
-        lat: 54.6850,
-        lng: 25.2890,
-        event_date: new Date(Date.now() + 21 * 86400000).toISOString(),
-        price: 8,
-        status: 'pending',
-        cover_image: 'https://images.unsplash.com/photo-1517602302552-471fe67acf66?auto=format&fit=crop&w=900&q=80',
-    },
-    {
-        id: 6,
-        organizer_id: 2,
-        organizer_name: 'Organizer',
-        title: 'Startuolių pusryčiai',
-        description: 'Tinklaveikos susitikimas ankstyvą rytą su kava ir investuotojais',
-        category: 'business',
-        location: 'Vilnius Tech Park',
-        lat: 54.6800,
-        lng: 25.2870,
-        event_date: new Date(Date.now() + 35 * 86400000).toISOString(),
-        price: 12,
-        status: 'approved',
-        cover_image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80',
-    },
-];
-
-const FALLBACK_NOTIFICATIONS = [
-    { id: 1, type: 'admin', message: '2 renginiai laukia patvirtinimo', created_at: 'prieš 5 min.' },
-    { id: 2, type: 'organizer', message: '„Miesto mugė“ patvirtinta ir matoma lankytojams', created_at: 'prieš 1 val.' },
-    { id: 3, type: 'user', message: 'Naujų renginių pagal jūsų pomėgius: muzika', created_at: 'vakar' },
-];
 
 const state = {
     map: null,
@@ -109,67 +9,54 @@ const state = {
     organizerEventsCache: [],
 };
 
-function getLocalEvents() {
-    const saved = localStorage.getItem(LOCAL_EVENTS_KEY);
-    return saved ? JSON.parse(saved) : [];
-}
-
-function upsertLocalEvent(event) {
-    const events = getLocalEvents();
-    const index = events.findIndex(e => String(e.id) === String(event.id));
-    if (index >= 0) {
-        events[index] = { ...events[index], ...event };
-    } else {
-        events.push(event);
-    }
-    localStorage.setItem(LOCAL_EVENTS_KEY, JSON.stringify(events));
-    return events;
-}
-
-function mergeWithLocalEvents(events = []) {
-    const localEvents = getLocalEvents();
-    const map = new Map();
-    [...events, ...localEvents].forEach(ev => {
-        map.set(String(ev.id), { ...ev });
-    });
-    return Array.from(map.values());
-}
-
 function getKnownEvents(filters = {}) {
     let events = state.events.length ? state.events : apiService.getCachedEvents();
-    if (!events.length) {
-        events = FALLBACK_EVENTS;
-    }
 
     if (filters.category) {
         events = events.filter(e => e.category === filters.category);
     }
 
-    return mergeWithLocalEvents(events);
+    return events;
 }
 
 async function ensureEventsLoaded(params = {}) {
-    if (!Object.keys(params).length && state.events.length) {
+    const hasFilters = Object.keys(params).length > 0;
+    if (!hasFilters && state.events.length) {
         return state.events;
     }
 
-    const { data, error } = await apiService.getEvents(params, FALLBACK_EVENTS);
-    const events = mergeWithLocalEvents(data || []);
-    if (!Object.keys(params).length || !error || !state.events.length) {
-        state.events = events;
+    const cached = apiService.getCachedEvents();
+    try {
+        const { data } = await apiService.getEvents(params);
+        const events = data || [];
+        if (!hasFilters) {
+            state.events = events;
+        }
+        return events;
+    } catch (error) {
+        if (cached.length) {
+            if (!hasFilters && !state.events.length) {
+                state.events = cached;
+            }
+            return cached;
+        }
+        throw error;
     }
-    return events;
 }
 
 async function ensureNotificationsLoaded() {
     if (state.notifications.length) return state.notifications;
 
+    const cached = apiService.getCachedNotifications();
     try {
-        const { data } = await apiService.getNotifications({}, FALLBACK_NOTIFICATIONS);
-        state.notifications = data && data.length ? data : FALLBACK_NOTIFICATIONS;
+        const { data } = await apiService.getNotifications();
+        state.notifications = data || [];
     } catch (err) {
-        const cached = apiService.getCachedNotifications();
-        state.notifications = cached.length ? cached : FALLBACK_NOTIFICATIONS;
+        if (cached.length) {
+            state.notifications = cached;
+        } else {
+            throw err;
+        }
     }
 
     return state.notifications;
@@ -627,7 +514,7 @@ async function loadEvents(filters = {}) {
         renderEvents(fallback);
         updateMap(fallback);
         if (container) {
-            container.insertAdjacentHTML('afterbegin', `<div class="loading">${err.message || 'Rodome išsaugotus renginius.'}</div>`);
+            container.insertAdjacentHTML('afterbegin', `<div class="loading">${err.message || 'Nepavyko gauti naujausių duomenų. Rodomi paskutiniai pasiekti renginiai.'}</div>`);
         }
     }
 }
@@ -706,28 +593,24 @@ function initCreateEventForm() {
             return;
         }
 
-        const draftEvent = {
-            ...payload,
-            id: Date.now(),
-            organizer_name: organizer?.name || 'Organizatorius',
-            status: 'pending',
-        };
-
         try {
-            await fetchJSON(`${API_BASE}?resource=events`, {
+            const response = await fetchJSON(`${API_BASE}?resource=events`, {
                 method: 'POST',
                 body: JSON.stringify(payload),
             });
-            upsertLocalEvent(draftEvent);
+            if (response?.event) {
+                state.events = [response.event, ...state.events.filter(ev => String(ev.id) !== String(response.event.id))];
+            }
             message.textContent = 'Paraiška pateikta! Būsena: Laukiama.';
             message.style.color = '#15803d';
         } catch (err) {
-            upsertLocalEvent(draftEvent);
-            message.textContent = err.message || 'Paraiška pateikta lokaliai. Būsena: Laukiama.';
-            message.style.color = '#15803d';
+            message.textContent = err.message || 'Nepavyko pateikti paraiškos.';
+            message.style.color = '#dc2626';
+            return;
         }
 
         form.reset();
+        await ensureEventsLoaded({ include_all: 1 }).catch(() => {});
         loadOrganizerEvents();
         loadEvents();
     });
@@ -1364,30 +1247,40 @@ function initOrganizerEditForm() {
             }
         }
 
-        const updated = {
-            ...target,
+        const payload = sanitizePayload({
+            id: target.id,
             description: description || target.description,
             cover_image: coverImage || target.cover_image,
             event_date: dateValue || target.event_date,
             status: target.status === 'approved' ? 'update_pending' : target.status,
-        };
+        });
 
-        upsertLocalEvent(updated);
-        const eventIndex = state.events.findIndex(ev => String(ev.id) === String(updated.id));
-        if (eventIndex >= 0) {
-            state.events[eventIndex] = { ...state.events[eventIndex], ...updated };
+        try {
+            const response = await fetchJSON(`${API_BASE}?resource=events`, {
+                method: 'PUT',
+                body: JSON.stringify(payload),
+            });
+
+            const updated = response.event || payload;
+            state.events = state.events.map(ev =>
+                String(ev.id) === String(updated.id) ? { ...ev, ...updated } : ev
+            );
+            state.organizerEventsCache = state.organizerEventsCache.map(ev =>
+                String(ev.id) === String(updated.id) ? { ...ev, ...updated } : ev
+            );
+
+            message.textContent = updated.status === 'update_pending'
+                ? 'Atnaujinimas laukia peržiūros.'
+                : 'Pakeitimai išsaugoti.';
+            message.style.color = '#15803d';
+            form.reset();
+            await ensureEventsLoaded({ include_all: 1 }).catch(() => {});
+            loadOrganizerEventsBoard();
+            loadOrganizerEvents();
+        } catch (err) {
+            message.textContent = err.message || 'Nepavyko išsaugoti pakeitimų.';
+            message.style.color = '#dc2626';
         }
-        state.organizerEventsCache = state.organizerEventsCache.map(ev =>
-            String(ev.id) === String(updated.id) ? updated : ev
-        );
-
-        message.textContent = updated.status === 'update_pending'
-            ? 'Atnaujinimas laukia peržiūros.'
-            : 'Pakeitimai išsaugoti.';
-        message.style.color = '#15803d';
-        form.reset();
-        loadOrganizerEventsBoard();
-        loadOrganizerEvents();
     });
 }
 
@@ -1611,7 +1504,7 @@ async function loadAdminPage() {
             }
         }
 
-        cachedEvents = mergeWithLocalEvents(events);
+        cachedEvents = events;
 
         if (!cachedEvents.length) {
             tableBody.innerHTML = '<tr><td colspan="6" class="empty">Renginių nėra</td></tr>';
@@ -1663,7 +1556,6 @@ async function loadAdminPage() {
 
             if (currentEvent) {
                 const updated = { ...currentEvent, status: e.target.dataset.status, rejection_reason: reason };
-                upsertLocalEvent(updated);
                 const eventIndex = state.events.findIndex(ev => String(ev.id) === String(updated.id));
                 if (eventIndex >= 0) state.events[eventIndex] = { ...state.events[eventIndex], ...updated };
                 addOrganizerNotification(updated, updated.status, reason);
@@ -1745,14 +1637,8 @@ document.addEventListener('DOMContentLoaded', init);
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         sanitizePayload,
-        mergeWithLocalEvents,
-        upsertLocalEvent,
-        getLocalEvents,
         formatStatus,
         addOrganizerNotification,
         state,
-        LOCAL_EVENTS_KEY,
-        FALLBACK_EVENTS,
-        FALLBACK_NOTIFICATIONS,
     };
 }
