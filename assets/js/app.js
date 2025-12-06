@@ -74,6 +74,8 @@ function parseStoredJSON(key, fallback = null) {
 const state = {
     map: null,
     markers: [],
+    userMarker: null,
+    locationRequested: false,
     events: [],
     notifications: [],
     favorites: [],
@@ -1010,6 +1012,46 @@ async function loadRecommendations() {
     }
 }
 
+function normalizeCoordinate(value) {
+    const numeric = typeof value === 'string' ? parseFloat(value) : value;
+    return Number.isFinite(numeric) ? numeric : null;
+}
+
+function markUserLocation(lat, lng) {
+    if (!state.map) return;
+    const normalizedLat = normalizeCoordinate(lat);
+    const normalizedLng = normalizeCoordinate(lng);
+    if (normalizedLat === null || normalizedLng === null) return;
+
+    if (state.userMarker) {
+        state.userMarker.remove();
+    }
+
+    state.userMarker = L.circleMarker([normalizedLat, normalizedLng], {
+        radius: 8,
+        color: '#2563eb',
+        fillColor: '#2563eb',
+        fillOpacity: 0.4,
+    }).addTo(state.map);
+    state.userMarker.bindPopup('Jūsų vieta');
+}
+
+function requestUserLocation() {
+    if (!navigator.geolocation || state.locationRequested || !document.getElementById('map')) return;
+    state.locationRequested = true;
+
+    navigator.geolocation.getCurrentPosition(({ coords }) => {
+        initMap();
+        markUserLocation(coords.latitude, coords.longitude);
+        state.map.setView([coords.latitude, coords.longitude], 13);
+    }, (error) => {
+        console.warn('Nepavyko gauti naudotojo vietos:', error);
+    }, {
+        enableHighAccuracy: true,
+        timeout: 5000,
+    });
+}
+
 function initMap() {
     const mapContainer = document.getElementById('map');
     if (!mapContainer || state.map) return;
@@ -1021,6 +1063,8 @@ function initMap() {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap',
     }).addTo(state.map);
+
+    requestUserLocation();
 }
 
 function updateMap(events = []) {
@@ -1030,7 +1074,14 @@ function updateMap(events = []) {
     state.markers.forEach(marker => marker.remove());
     state.markers = [];
 
-    const points = events.filter(e => e.lat && e.lng);
+    const points = events
+        .map(event => ({
+            ...event,
+            lat: normalizeCoordinate(event.lat),
+            lng: normalizeCoordinate(event.lng),
+        }))
+        .filter(e => e.lat !== null && e.lng !== null);
+
     points.forEach(event => {
         const marker = L.marker([event.lat, event.lng]).addTo(state.map);
         marker.bindPopup(`<strong>${event.title}</strong><br>${event.location}`);
@@ -1894,6 +1945,8 @@ async function loadAdminPage() {
 function initHomePage() {
     initSearch();
     initCreateEventForm();
+    initMap();
+    requestUserLocation();
     loadEvents();
     loadRecommendations();
     loadOrganizerEvents();
